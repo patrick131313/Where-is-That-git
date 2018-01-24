@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/list_navigation_highscores_item"
+        android:title="@string/leaderboard"
+        android:icon="@drawable/ic_leaderboard_24dp">
+    </item>
+
+    <item
+        android:id="@+id/list_navigation_settings_item"
+        android:title="@string/settings"
+        android:icon="@drawable/ic_settings_24dp">
+    </item>
+
+    <item
+        android:id="@+id/list_navigation_invite_friends"
+        android:title="@string/invite_friends"
+        android:icon="@drawable/ic_invite_24dp">
+    </item>
+    <item
+        android:id="@+id/list_navigation_logout_item"
+        android:title="@string/logout"
+        android:icon="@drawable/ic_logout_24dp">
+    </item>
+
+
+</menu>
