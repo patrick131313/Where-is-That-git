@@ -9,9 +9,31 @@
     tools:context="com.patrick.whereisthat.StartActivity"
     tools:openDrawer="start">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button_start_game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start game"
+            android:layout_centerInParent="true"
+            android:onClick="startGameClick"
+
+
+
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sprint mode"
+            android:layout_below="@id/button_start_game"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="10dp"
+           />
+
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -22,8 +44,8 @@
             android:layout_height="match_parent"
             map:liteMode="true"/>
 
-    </FrameLayout>
 
+    </RelativeLayout>
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
