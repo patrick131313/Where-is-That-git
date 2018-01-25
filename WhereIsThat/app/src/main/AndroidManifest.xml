@@ -50,7 +50,9 @@
         <activity
             android:name=".login.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".login.LoginActivity" />
+        <activity android:name=".register.RegisterActivity"></activity>
     </application>
 
 </manifest>

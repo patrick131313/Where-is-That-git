@@ -1,8 +1,13 @@
 package com.patrick.whereisthat;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,12 +19,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.patrick.whereisthat.login.LoginActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
 
 
 public class StartActivity extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
+    private DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
        mapFragment.getMapAsync(this);
+       setUpNavDrawer();
+
     }
 
 
@@ -69,4 +78,42 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
         startActivity(intent);
 
     }
+    public void setUpNavDrawer()
+    {
+
+        NavigationView mNavigationView=findViewById(R.id.nav_view);
+        if(mNavigationView!=null)
+            setUpNavListener(mNavigationView);
+    }
+
+    public void setUpNavListener(NavigationView navigationView)
+    {
+        navigationView.setNavigationItemSelectedListener(
+        new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.leaderboard_navigation_menu_item:
+                        break;
+                    case R.id.invite_navigation_menu_item:
+                        break;
+                    case R.id.settings_navigation_menu_item:
+                        break;
+                    case R.id.logout_navigation_menu_item:
+                        Log.d("Logout","Logout clicked");
+                        Intent intent=new Intent(getApplication(),LoginActivity.class);
+                        startActivity(intent);
+                        break;
+
+                    default:
+                    break;
+                }
+
+                return true;
+            }
+
+        });
+
+    };
+
 }
