@@ -1,5 +1,6 @@
 package com.patrick.whereisthat.register;
 
+import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.R;
+import com.patrick.whereisthat.StartActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private boolean mExist;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +56,12 @@ public class RegisterActivity extends AppCompatActivity {
                 final String password = mPassword.getText().toString();
                 Log.d("Email:", email.toString());
                 Log.d("Password:", password.toString());
-                //checkIfUserExists(user);
-                Log.d("Boolean:",String.valueOf(mExist));
+
+
                 checkIfUserExists(email,user,password);
+
+
+
             }
         });
 
@@ -64,10 +69,10 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     }
-   int checkIfUserExists(final String email,final String user,final String password)
+   void  checkIfUserExists(final String email,final String user,final String password)
     {
-        final int[] flag = {0};
-        Log.d("Flag-start", String.valueOf(flag[0]));
+
+
        DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
                 Query query=myRef.child("users").orderByChild("user").equalTo(user);
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -76,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                         if(dataSnapshot.exists()) {
                             Log.d("Query", "User exits");
                             toastExits();
-                            flag[0]=1;
+
 
                         }
                         else {
@@ -98,6 +103,8 @@ public class RegisterActivity extends AppCompatActivity {
                                                     info.put("level" + String.valueOf(i), 0);
                                                 info.put("sprint_mode", 0);
                                                 userDb.updateChildren(info);
+                                                Intent intent=new Intent(getApplication(), StartActivity.class);
+                                                startActivity(intent);
 
 
                                             } else
@@ -120,24 +127,18 @@ public class RegisterActivity extends AppCompatActivity {
 
                     }
                 });
-        Log.d("Flag", String.valueOf(flag[0]));
 
-
-        if(flag[0]==1)
-            return 1;
-        else
-            return 0;
     }
     public void toastSuccesful()
     {
         Toast.makeText(getApplication(), "Registration successful", Toast.LENGTH_LONG).show();
-        mExist=false;
+
 
     }
     public void toastExits()
     {
         Toast.makeText(this,"This user already exists",Toast.LENGTH_LONG).show();
-        mExist=true;
+
 
     }
 

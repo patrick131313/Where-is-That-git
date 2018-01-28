@@ -5,10 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,6 +22,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.login.LoginActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
 
@@ -27,17 +37,34 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private DrawerLayout mDrawerLayout;
+    private FirebaseAuth mFirebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-       mapFragment.getMapAsync(this);
-       setUpNavDrawer();
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        if (mFirebaseAuth.getCurrentUser() != null) {
+            getUsername(mFirebaseAuth.getUid());
+            Log.d("Login", mFirebaseAuth.getUid());
+            setContentView(R.layout.activity_start);
+            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+            setUpNavDrawer();
+
+
+
+
+
+        }
+        else
+        {
+            Log.d("Login","not logged in");
+            Intent intent=new Intent(getApplication(),LoginActivity.class);
+            startActivity(intent);
+        }
     }
 
 
@@ -100,10 +127,21 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                     case R.id.settings_navigation_menu_item:
                         break;
                     case R.id.logout_navigation_menu_item:
-                        Log.d("Logout","Logout clicked");
-                        Intent intent=new Intent(getApplication(),LoginActivity.class);
-                        startActivity(intent);
-                        break;
+                        String title=item.getTitle().toString();
+                        if(title.equals("Logout"))
+                        {
+                            mFirebaseAuth.signOut();
+                            logoutToast();
+                            changeMenuToLogout();
+                            deleteUsername();
+
+                        }
+                        else {
+                            Log.d("Logout", "Logout clicked");
+                            Intent intent = new Intent(getApplication(), LoginActivity.class);
+                            startActivity(intent);
+                            break;
+                        }
 
                     default:
                     break;
@@ -115,5 +153,58 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
         });
 
     };
+
+    public void getUsername(String key)
+    {
+        DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
+        Query query=myRef.child("users").child(key).child("user");
+        Log.d("MyRef",query.toString());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //String userName=dataSnapshot.getValue().toString();
+               // Log.d("MyRef",userName);
+                setUsername(dataSnapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void setUsername(String username)
+    {
+        TextView textView=findViewById(R.id.textView_user);
+        textView.setText("You are logged in as:"+username);
+    }
+    public void deleteUsername()
+    {
+        TextView textView=findViewById(R.id.textView_user);
+        textView.setText("You must log in");
+    }
+
+
+    public void changeMenuToLogout()
+    {
+        NavigationView mNavigationView=findViewById(R.id.nav_view);
+        Menu menu=mNavigationView.getMenu();
+        MenuItem item=menu.findItem(R.id.logout_navigation_menu_item);
+        item.setTitle("Login");
+        item.setIcon(ContextCompat.getDrawable(this,R.drawable.ic_login_24dp));
+       /* item.setTitle("Tezd");
+        item.setIcon(ContextCompat.getDrawable(this,R.drawable.ic_share_24dp));*/
+    }
+    public void logoutToast()
+    {
+        Toast.makeText(this,"You are logged out",Toast.LENGTH_LONG).show();
+    }
+
+
+
+
+
 
 }
