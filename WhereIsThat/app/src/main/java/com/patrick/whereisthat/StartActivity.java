@@ -29,8 +29,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.patrick.whereisthat.data.Scores;
 import com.patrick.whereisthat.login.LoginActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
+
+import java.util.List;
 
 
 public class StartActivity extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
@@ -39,11 +42,22 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth mFirebaseAuth;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       /*setContentView(R.layout.activity_start);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        setUpNavDrawer();*/
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
+         mFirebaseAuth = FirebaseAuth.getInstance();
+
+
+
+
         if (mFirebaseAuth.getCurrentUser() != null) {
             getUsername(mFirebaseAuth.getUid());
             Log.d("Login", mFirebaseAuth.getUid());
@@ -127,10 +141,11 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                     case R.id.settings_navigation_menu_item:
                         break;
                     case R.id.logout_navigation_menu_item:
-                        String title=item.getTitle().toString();
+                       String title=item.getTitle().toString();
                         if(title.equals("Logout"))
                         {
-                            mFirebaseAuth.signOut();
+                        //    mFirebaseAuth.signOut();
+                            FirebaseAuth.getInstance().signOut();
                             logoutToast();
                             changeMenuToLogout();
                             deleteUsername();
@@ -142,6 +157,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                             startActivity(intent);
                             break;
                         }
+
 
                     default:
                     break;

@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.StartActivity;
+import com.patrick.whereisthat.login.LoginActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +49,18 @@ public class RegisterActivity extends AppCompatActivity {
         mCreateAccount=findViewById(R.id.create_account_button);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+                if(mUser!=null){
+                    Intent intent = new Intent(getApplication(), StartActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+            }
+        };
 
         mCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,14 +83,20 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     }
-   void  checkIfUserExists(final String email,final String user,final String password)
+  void  checkIfUserExists(final String email,final String user,final String password)
     {
 
-
-       DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
+        Log.d("Query", email.toString());
+        Log.d("Query", user.toString());
+        Log.d("Query",password.toString());
+        //mFirebaseAuth.signInAnonymously();
+       // mFirebaseAuth.signInWithEmailAndPassword("suciu.patrick@gmail.coom","patrick1313");
+        DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
+        Log.d("Query",myRef.toString());
                 Query query=myRef.child("users").orderByChild("user").equalTo(user);
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
+              query.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                  @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.exists()) {
                             Log.d("Query", "User exits");
@@ -103,20 +123,21 @@ public class RegisterActivity extends AppCompatActivity {
                                                     info.put("level" + String.valueOf(i), 0);
                                                 info.put("sprint_mode", 0);
                                                 userDb.updateChildren(info);
-                                                Intent intent=new Intent(getApplication(), StartActivity.class);
-                                                startActivity(intent);
+                                            /*    Intent intent=new Intent(getApplication(), StartActivity.class);
+                                                startActivity(intent);*/
 
 
                                             } else
                                                 Toast.makeText(getApplication(), "Error", Toast.LENGTH_LONG).show();
 
                                         }
-                                    }).addOnFailureListener(new OnFailureListener() {
+                                    }
+                          ).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
-                                }
+                                    Log.d("Query", e.toString());                                }
                             });
+
 
 
                         }
@@ -124,7 +145,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                    Log.d("Query",databaseError.toString());
                     }
                 });
 
@@ -142,5 +163,19 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+
+    }
 }
 
