@@ -1,22 +1,42 @@
 package com.patrick.whereisthat.level;
 
 import android.annotation.SuppressLint;
+import android.arch.persistence.room.Room;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.patrick.whereisthat.R;
+import com.patrick.whereisthat.levelsDB.Level;
+import com.patrick.whereisthat.levelsDB.LevelDao;
+import com.patrick.whereisthat.levelsDB.LevelDatabase;
+import com.patrick.whereisthat.levelsDB.Values;
+import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -29,6 +49,21 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
      */
     private static final boolean AUTO_HIDE = true;
     private GoogleMap mMap;
+    private GoogleMap mDmmyMap;
+    private TextView mTime;
+    long startTime = 0L;
+    long timeInMilliseconds=0L;
+    long timeSwapBuff=0L;
+    long updateTime=0L;
+    Handler customHandler = new Handler();
+    String TAG="LevelActivity";
+    private List<Level> levelList = new ArrayList<>();
+    private LevelDao levelDao;
+    String mLevel;
+    private ImageView mImageView;
+    private Button mConfirm;
+
+
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -88,43 +123,53 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_level);
 
+        setContentView(R.layout.activity_level);
+        mImageView=findViewById(R.id.image_view_db);
+        mConfirm=findViewById(R.id.button_confirm);
+        mImageView.setVisibility(View.VISIBLE);
+
+        mLevel=getIntent().getStringExtra(SelectLevelActivity.EXTRA_LEVEL_KEY);
+        new DataTask().execute();
+
+      //
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.map);
+        mTime=findViewById(R.id.text_view_timer);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync((OnMapReadyCallback) this);
 
+
+
     }
 
     public void onMapReady(GoogleMap googleMap) {
+        StartTimer();
         mMap = googleMap;
-       // mMap.setOnMapClickListener(this);
-       LatLng home = new LatLng(48.139699, 15.943359);
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_test));
+       mMap.setOnMapClickListener(this);
+      /* LatLng home = new LatLng(48.139699, 15.943359);
         CameraPosition cp = CameraPosition.builder()
                 .target(home)
                 .zoom(3)
                 .bearing(0)
                 .tilt(0) //sau tilt 45
-                .build();
+                .build();*/
         //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 5000, null);
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 1, null);
+   //     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 1, null);
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
- //         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_start_style));
         LatLngBounds Europe = new LatLngBounds(  new LatLng(37, -30), new LatLng(71, 50.5));
         mMap.setMinZoomPreference(4.0f);
-
+        mMap.setMaxZoomPreference(7.0f);
         mMap.setLatLngBoundsForCameraTarget(Europe);
 
-     /*   LatLng sydney = new LatLng(-34, 151);
 
-        // Add a marker in Sydney and move the camera
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -170,5 +215,147 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     @Override
     public void onMapClick(LatLng latLng) {
 
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latLng.latitude, latLng.longitude))
+                .title("Problem"));
+
+
+
+
     }
+    Runnable updateTimerThread = new Runnable() {
+        @Override
+        public void run() {
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updateTime = timeSwapBuff+timeInMilliseconds;
+            int secs = (int)(updateTime/1000);
+            int mins = secs/60;
+            secs%=60;
+            int miliseconds = (int)(updateTime%1000);
+            miliseconds=miliseconds/10;
+            mTime.setText(""+mins+":"+String.format("%02d",secs)+":"
+                    +String.format("%02d",miliseconds));
+            customHandler.postDelayed(this,0);
+        }
+    };
+    public void StartTimer()
+    {
+        timeSwapBuff=0;
+        startTime = SystemClock.uptimeMillis();
+        customHandler.postDelayed(updateTimerThread,0);
+    }
+    public void StopTimer()
+    {
+        timeSwapBuff+=timeInMilliseconds;
+        customHandler.removeCallbacks(updateTimerThread);
+    }
+    public void ContinueTimer()
+    {
+        startTime = SystemClock.uptimeMillis();
+        customHandler.postDelayed(updateTimerThread,0);
+    }
+
+
+    public class DataTask extends AsyncTask<Void, Void, List<Level>> {
+
+        @Override
+        protected List<Level> doInBackground(Void... voids) {
+            List<Level> LevelList=new ArrayList<>();
+            LevelDatabase db = Room.databaseBuilder(getApplicationContext(), LevelDatabase.class, "levels")
+                    .allowMainThreadQueries()
+                    .build();
+            levelDao = db.levelDao();
+            // levelDao.deleteAll();
+            if (db.levelDao().lines() == 0) {
+                Values values = new Values();
+                levelList = values.getValues();
+                Log.i(TAG, "onCreate: db: " + levelList.toString());
+                Log.i(TAG, "onCreate: db: " + values.getValues().toString());
+                levelDao.insertAll(levelList);
+
+            }
+            switch (mLevel) {
+                case "1":
+                    LevelList= db.levelDao().getLevel1();
+                break;
+                case "2":
+                    LevelList = db.levelDao().getLevel2();
+                break;
+                case "3":
+                    LevelList = db.levelDao().getLevel3();
+                break;
+                case "4":
+                    LevelList = db.levelDao().getLevel4();
+                break;
+                case "5":
+                    LevelList = db.levelDao().getLevel5();
+                break;
+                case "6":
+                    LevelList = db.levelDao().getLevel6();
+                break;
+                case "7":
+                    LevelList = db.levelDao().getLevel7();
+                break;
+                case "8":
+                    LevelList = db.levelDao().getLevel8();
+                break;
+                case "9":
+                    LevelList = db.levelDao().getLevel9();
+                break;
+                case "10":
+                    LevelList = db.levelDao().getLevel10();
+                break;
+                case "11":
+                    LevelList = db.levelDao().getLevel11();
+                break;
+            }
+            return LevelList;
+        }
+
+        @Override
+        protected void onPostExecute(List<Level> levels) {
+            super.onPostExecute(levels);
+            Log.i(TAG, "onCreate: db: " +"test");
+
+            levelList = levels;
+            Log.i(TAG,String.valueOf(levelDao.lines()));
+            for (int i = 0; i < 10; i++) {
+                Log.i(TAG, "onCreate: db: " + levelList.get(i).getPhoto().toString());
+
+                new ImageTask().execute();
+            }
+         //  change_picture();
+
+        }
+    }
+  /*  void change_picture()
+    {
+
+
+
+
+    }*/
+
+    public class ImageTask extends AsyncTask<Void, Void,Integer> {
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return getResources().getIdentifier(levelList.get(0).getPhoto(), "drawable", getPackageName());
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            Glide.with(getApplicationContext())
+                    .load(integer)
+                    .into(mImageView);
+        }
+    }
+
+//    @Override
+   /* protected void onDestroy() {
+        super.onDestroy();
+        if(mImageView != null)
+            ((BitmapDrawable)mImageView.getDrawable()).getBitmap().recycle();
+    }*/
 }

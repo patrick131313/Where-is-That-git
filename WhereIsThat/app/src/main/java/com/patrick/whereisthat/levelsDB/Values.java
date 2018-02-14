@@ -27,7 +27,7 @@ public class Values {
 
         levelList.add(new Level("2","acropolis","37.970532","23.729276","–", "Hint_acropolis"));
         levelList.add(new Level("2","brandenburg","52.516275","13.377704", "–","Hint_brandenburg"));
-        levelList.add(new Level("2","st.basil","55.752523","37.623087", "–","Hint_st.basil"));
+        levelList.add(new Level("2","st_basil","55.752523","37.623087", "–","Hint_st.basil"));
         levelList.add(new Level("2","colosseum","41.890210","12.492231","–","Hint_colosseum"));
         levelList.add(new Level("2","eiffel","48.858370","2.294481","–","Hint_eiffel"));
         levelList.add(new Level("2","sagrada","41.403630","2.174356","–","Hint_sagrada"));

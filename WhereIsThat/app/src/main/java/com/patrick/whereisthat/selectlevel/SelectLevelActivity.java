@@ -39,6 +39,7 @@ public class SelectLevelActivity extends AppCompatActivity {
     private RecyclerViewAdapter mAdapter;
     private RecyclerView mRecyclerView;
     Map<String,Long> mHighscores=new HashMap<String, Long>();
+    public static final String EXTRA_LEVEL_KEY="LEVEL_KEY";
    
     private String []mArrayLevels={"Level1:11","Level2:22","Level3:33","Level4:44","Level5:55","Level6:66",
             "Level7:77","Level8:88","Level9:99","Level10:100","Level11:111"};
@@ -127,6 +128,7 @@ public class SelectLevelActivity extends AppCompatActivity {
                     public void onClick(View view) {
                       // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
                         Intent intent=new Intent(getApplicationContext(), LevelActivity.class);
+                        intent.putExtra(EXTRA_LEVEL_KEY,String.valueOf(position+1));
                         startActivity(intent);
                     }
                 });
