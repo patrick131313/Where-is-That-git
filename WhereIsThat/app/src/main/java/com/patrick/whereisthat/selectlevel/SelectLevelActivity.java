@@ -2,6 +2,7 @@ package com.patrick.whereisthat.selectlevel;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.data.FirebaseScores;
 import com.patrick.whereisthat.data.Scores;
+import com.patrick.whereisthat.level.LevelActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,7 +125,9 @@ public class SelectLevelActivity extends AppCompatActivity {
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();;
+                      // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
+                        Intent intent=new Intent(getApplicationContext(), LevelActivity.class);
+                        startActivity(intent);
                     }
                 });
             }
