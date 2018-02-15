@@ -2,6 +2,10 @@ package com.patrick.whereisthat.level;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
+import android.databinding.DataBindingUtil;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
@@ -17,6 +21,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,12 +29,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.patrick.whereisthat.R;
+import com.patrick.whereisthat.databinding.ActivityLevelBinding;
 import com.patrick.whereisthat.levelsDB.Level;
 import com.patrick.whereisthat.levelsDB.LevelDao;
 import com.patrick.whereisthat.levelsDB.LevelDatabase;
 import com.patrick.whereisthat.levelsDB.Values;
+import com.patrick.whereisthat.login.LoginActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +66,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     private ImageView mImageView;
     private Button mConfirm;
     int mCurrent=0;
-
+    ActivityLevelBinding mBinding;
+    private LatLng mLatLng;
+    private long mScore=0;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -118,10 +128,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        setContentView(R.layout.activity_level);
-        mImageView=findViewById(R.id.image_view_db);
-        mConfirm=findViewById(R.id.button_confirm);
+        mBinding= DataBindingUtil.setContentView(this,R.layout.activity_level);
+     //   mImageView=findViewById(R.id.image_view_db);
+      //  mConfirm=findViewById(R.id.button_confirm);
 
 
         mLevel=getIntent().getStringExtra(SelectLevelActivity.EXTRA_LEVEL_KEY);
@@ -135,15 +144,36 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync((OnMapReadyCallback) this);
-        mConfirm.setOnClickListener(new View.OnClickListener() {
+        mBinding.buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                StopTimer();
+                getCity();
                 new ImageTask().execute();
+            }
+        });
 
-                /*Glide.with(getApplicationContext())
-                        .load(getResources().getIdentifier(levelList.get(mCurrent).getPhoto(), "drawable", getPackageName()))
-                        .into(mImageView);
-                mCurrent++;*/
+        mBinding.imageViewClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBinding.imageViewClose.setVisibility(View.INVISIBLE);
+                mBinding.imageViewDb.setVisibility(View.INVISIBLE);
+
+            }
+        });
+
+        mBinding.buttonHint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBinding.textViewHint.setVisibility(View.VISIBLE);
+                mBinding.imageViewHint.setVisibility(View.VISIBLE);
+            }
+        });
+        mBinding.imageViewHint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBinding.textViewHint.setVisibility(View.INVISIBLE);
+                mBinding.imageViewHint.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -155,23 +185,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
-      /* LatLng home = new LatLng(48.139699, 15.943359);
-        CameraPosition cp = CameraPosition.builder()
-                .target(home)
-                .zoom(3)
-                .bearing(0)
-                .tilt(0) //sau tilt 45
-                .build();*/
-        //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 5000, null);
-        //     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 1, null);
-      /*  mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_test));
-        LatLngBounds Europe = new LatLngBounds(  new LatLng(37, -30), new LatLng(71, 50.5));
-        mMap.setMinZoomPreference(4.0f);
-        mMap.setMaxZoomPreference(7.0f);
-        mMap.setLatLngBoundsForCameraTarget(Europe);*/
-      new MapTask().execute();
-
+        new MapTask().execute();
 
 
     }
@@ -225,10 +239,70 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latLng.latitude, latLng.longitude))
                 .title("Problem"));
+        mLatLng=latLng;
+    }
+    public void getCity()
+    {
+        Geocoder geocoder;
+        List<Address> adresses;
+        geocoder = new Geocoder(this);
+        try {
+            adresses = geocoder.getFromLocation(mLatLng.latitude, mLatLng.longitude, 1);
+            if(adresses.isEmpty())
+            {
+
+                LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent).getLatitude()),Double.parseDouble(levelList.get(mCurrent).getLongitude()));
+                score(dbLatLng,mLatLng);
+            }
+            else {
+
+                String city = adresses.get(0).getLocality();
+                if(city==null)
+                    city="-";
+                Bundle bundle = adresses.get(0).getExtras();
+                Log.i(TAG, "getCity: "+city);
+                Log.i(TAG, "getCity: "+levelList.get(mCurrent).getCity());
+                if (city.equals(levelList.get(mCurrent).getCity()))
+                    score_city();
+                else {
+                    LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent).getLatitude()), Double.parseDouble(levelList.get(mCurrent).getLongitude()));
+                    score(dbLatLng, mLatLng);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Bundle_error", e.toString());
+            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+
+        }
+    }
 
 
-
-
+    public float getDistance(LatLng LatLng1, LatLng LatLng2) {
+        double distance = 0;
+        Location locationA = new Location("A");
+        locationA.setLatitude(LatLng1.latitude);
+        locationA.setLongitude(LatLng1.longitude);
+        Location locationB = new Location("B");
+        locationB.setLatitude(LatLng2.latitude);
+        locationB.setLongitude(LatLng2.longitude);
+        distance = locationA.distanceTo(locationB) * 100;
+        int km = ((int) distance) / 1000;
+        float kmtot = km;
+        return kmtot / 100;
+    }
+    public void score(LatLng latLng1,LatLng latLng2)
+    {
+        float distance = getDistance(latLng1, latLng2);
+        long Score=50000-updateTime-(long) distance*10;
+        mScore=mScore+Score;
+        mBinding.textViewScore.setText(String.valueOf(mScore));
+    }
+    public void score_city()
+    {
+        long Score=50000-updateTime;
+        mScore=mScore+Score;
+        mBinding.textViewScore.setText(String.valueOf(mScore));
     }
     Runnable updateTimerThread = new Runnable() {
         @Override
@@ -261,6 +335,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         startTime = SystemClock.uptimeMillis();
         customHandler.postDelayed(updateTimerThread,0);
     }
+
 
 
     public class DataTask extends AsyncTask<Void, Void, List<Level>> {
@@ -348,18 +423,23 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            StartTimer();
+
             if(integer==-1) {
-                mImageView.setVisibility(View.INVISIBLE);
+                mBinding.imageViewDb.setVisibility(View.INVISIBLE);
                 Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
                 mCurrent=0;
             }
             else {
+                mBinding.imageViewDb.setVisibility(View.VISIBLE);
+                mBinding.imageViewClose.setVisibility(View.VISIBLE);
+                mBinding.textViewHint.setText(levelList.get(mCurrent).getHint());
                 Glide.with(getApplicationContext())
                         .load(integer)
-                        .into(mImageView);
-                mImageView.setVisibility(View.VISIBLE);
+                        .into(mBinding.imageViewDb);
+
+
                 mCurrent++;
+
                 Log.i(TAG, "onPostExecute: " + String.valueOf(mCurrent));
             }
         }
@@ -367,7 +447,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
     public class MapTask extends AsyncTask<Void, Void, Integer>
     {
-
 
         @Override
         protected Integer doInBackground(Void... voids) {
@@ -386,6 +465,30 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);
             mMap.setLatLngBoundsForCameraTarget(Europe);
+           new VisibleTask().execute();
+
+        }
+    }
+
+    public class VisibleTask extends AsyncTask<Void,Void,Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mBinding.imageViewDb.setVisibility(View.VISIBLE);
+            mBinding.imageViewClose.setVisibility(View.VISIBLE);
+            mBinding.textViewScore.setVisibility(View.VISIBLE);
+            mBinding.textViewTimer.setVisibility(View.VISIBLE);
+            mBinding.buttonHint.setVisibility(View.VISIBLE);
+            mBinding.buttonConfirm.setVisibility(View.VISIBLE);
+            StartTimer();
+
         }
     }
 }
