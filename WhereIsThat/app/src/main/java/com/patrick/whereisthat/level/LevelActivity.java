@@ -2,7 +2,6 @@ package com.patrick.whereisthat.level;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBar;
@@ -10,23 +9,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.levelsDB.Level;
@@ -62,7 +57,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     String mLevel;
     private ImageView mImageView;
     private Button mConfirm;
-
+    int mCurrent=0;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -99,7 +94,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         @Override
         public void run() {
             // Delayed display of UI elements
-           ActionBar actionBar = getSupportActionBar();
+            ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
             }
@@ -127,12 +122,12 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         setContentView(R.layout.activity_level);
         mImageView=findViewById(R.id.image_view_db);
         mConfirm=findViewById(R.id.button_confirm);
-        mImageView.setVisibility(View.VISIBLE);
+
 
         mLevel=getIntent().getStringExtra(SelectLevelActivity.EXTRA_LEVEL_KEY);
         new DataTask().execute();
 
-      //
+        //
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.map);
@@ -140,16 +135,26 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync((OnMapReadyCallback) this);
+        mConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new ImageTask().execute();
+
+                /*Glide.with(getApplicationContext())
+                        .load(getResources().getIdentifier(levelList.get(mCurrent).getPhoto(), "drawable", getPackageName()))
+                        .into(mImageView);
+                mCurrent++;*/
+            }
+        });
 
 
 
     }
 
     public void onMapReady(GoogleMap googleMap) {
-        StartTimer();
+
         mMap = googleMap;
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_test));
-       mMap.setOnMapClickListener(this);
+        mMap.setOnMapClickListener(this);
       /* LatLng home = new LatLng(48.139699, 15.943359);
         CameraPosition cp = CameraPosition.builder()
                 .target(home)
@@ -158,13 +163,14 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 .tilt(0) //sau tilt 45
                 .build();*/
         //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 5000, null);
-   //     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 1, null);
-        mMap.getUiSettings().setMapToolbarEnabled(false);
-
+        //     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 1, null);
+      /*  mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_test));
         LatLngBounds Europe = new LatLngBounds(  new LatLng(37, -30), new LatLng(71, 50.5));
         mMap.setMinZoomPreference(4.0f);
         mMap.setMaxZoomPreference(7.0f);
-        mMap.setLatLngBoundsForCameraTarget(Europe);
+        mMap.setLatLngBoundsForCameraTarget(Europe);*/
+      new MapTask().execute();
 
 
 
@@ -278,37 +284,37 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             switch (mLevel) {
                 case "1":
                     LevelList= db.levelDao().getLevel1();
-                break;
+                    break;
                 case "2":
                     LevelList = db.levelDao().getLevel2();
-                break;
+                    break;
                 case "3":
                     LevelList = db.levelDao().getLevel3();
-                break;
+                    break;
                 case "4":
                     LevelList = db.levelDao().getLevel4();
-                break;
+                    break;
                 case "5":
                     LevelList = db.levelDao().getLevel5();
-                break;
+                    break;
                 case "6":
                     LevelList = db.levelDao().getLevel6();
-                break;
+                    break;
                 case "7":
                     LevelList = db.levelDao().getLevel7();
-                break;
+                    break;
                 case "8":
                     LevelList = db.levelDao().getLevel8();
-                break;
+                    break;
                 case "9":
                     LevelList = db.levelDao().getLevel9();
-                break;
+                    break;
                 case "10":
                     LevelList = db.levelDao().getLevel10();
-                break;
+                    break;
                 case "11":
                     LevelList = db.levelDao().getLevel11();
-                break;
+                    break;
             }
             return LevelList;
         }
@@ -323,39 +329,65 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             for (int i = 0; i < 10; i++) {
                 Log.i(TAG, "onCreate: db: " + levelList.get(i).getPhoto().toString());
 
-                new ImageTask().execute();
-            }
-         //  change_picture();
 
+            }
+            new ImageTask().execute();
         }
     }
-  /*  void change_picture()
-    {
 
-
-
-
-    }*/
 
     public class ImageTask extends AsyncTask<Void, Void,Integer> {
         @Override
         protected Integer doInBackground(Void... voids) {
-            return getResources().getIdentifier(levelList.get(0).getPhoto(), "drawable", getPackageName());
+            if(mCurrent!=10)
+            return getResources().getIdentifier(levelList.get(mCurrent).getPhoto(), "drawable", getPackageName());
+            else
+                return -1;
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            Glide.with(getApplicationContext())
-                    .load(integer)
-                    .into(mImageView);
+            StartTimer();
+            if(integer==-1) {
+                mImageView.setVisibility(View.INVISIBLE);
+                Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
+                mCurrent=0;
+            }
+            else {
+                Glide.with(getApplicationContext())
+                        .load(integer)
+                        .into(mImageView);
+                mImageView.setVisibility(View.VISIBLE);
+                mCurrent++;
+                Log.i(TAG, "onPostExecute: " + String.valueOf(mCurrent));
+            }
         }
     }
 
-//    @Override
-   /* protected void onDestroy() {
-        super.onDestroy();
-        if(mImageView != null)
-            ((BitmapDrawable)mImageView.getDrawable()).getBitmap().recycle();
-    }*/
+    public class MapTask extends AsyncTask<Void, Void, Integer>
+    {
+
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+
+
+            return 1;
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
+            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
+            LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
+            mMap.setMinZoomPreference(4.0f);
+            mMap.setMaxZoomPreference(7.0f);
+            mMap.setLatLngBoundsForCameraTarget(Europe);
+        }
+    }
 }
+
+
