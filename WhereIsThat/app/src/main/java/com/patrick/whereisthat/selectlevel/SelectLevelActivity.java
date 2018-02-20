@@ -40,7 +40,9 @@ public class SelectLevelActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     Map<String,Long> mHighscores=new HashMap<String, Long>();
     public static final String EXTRA_LEVEL_KEY="LEVEL_KEY";
-   
+    public static final String EXTRA_HIGHSCORE_KEY="HIGHSCORE_KEY";
+    public static final String EXTRA_OVERALL_KEY="OVERALL_KEY";
+
     private String []mArrayLevels={"Level1:11","Level2:22","Level3:33","Level4:44","Level5:55","Level6:66",
             "Level7:77","Level8:88","Level9:99","Level10:100","Level11:111"};
 
@@ -121,7 +123,7 @@ public class SelectLevelActivity extends AppCompatActivity {
             }
             else
             {
-                Object score=mHighscores.get("level"+String.valueOf(position+1));
+                final Object score=mHighscores.get("level"+String.valueOf(position+1));
                 holder.mHighscore.setText("Higscore:"+score.toString());
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -129,6 +131,8 @@ public class SelectLevelActivity extends AppCompatActivity {
                       // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
                         Intent intent=new Intent(getApplicationContext(), LevelActivity.class);
                         intent.putExtra(EXTRA_LEVEL_KEY,String.valueOf(position+1));
+                        intent.putExtra(EXTRA_HIGHSCORE_KEY,score.toString());
+                        intent.putExtra(EXTRA_OVERALL_KEY,mHighscores.get("overall").toString());
                         startActivity(intent);
                     }
                 });

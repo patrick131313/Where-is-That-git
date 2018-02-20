@@ -28,6 +28,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.databinding.ActivityLevelBinding;
 import com.patrick.whereisthat.levelsDB.Level;
@@ -69,6 +72,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     ActivityLevelBinding mBinding;
     private LatLng mLatLng;
     private long mScore=0;
+    private String mHigscore;
+    private String mOverall;
+    private boolean hint_pressed=false;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -134,6 +140,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
 
         mLevel=getIntent().getStringExtra(SelectLevelActivity.EXTRA_LEVEL_KEY);
+        mHigscore= getIntent().getStringExtra(SelectLevelActivity.EXTRA_HIGHSCORE_KEY);
+        mOverall=getIntent().getStringExtra(SelectLevelActivity.EXTRA_OVERALL_KEY);
+     //  Toast.makeText(getApplicationContext(),mOverall,Toast.LENGTH_LONG).show();
         new DataTask().execute();
 
         //
@@ -148,7 +157,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             @Override
             public void onClick(View view) {
                 StopTimer();
-                getCity();
+                new ScoreTask().execute();
                 new ImageTask().execute();
             }
         });
@@ -167,6 +176,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             public void onClick(View view) {
                 mBinding.textViewHint.setVisibility(View.VISIBLE);
                 mBinding.imageViewHint.setVisibility(View.VISIBLE);
+                hint_pressed=true;
             }
         });
         mBinding.imageViewHint.setOnClickListener(new View.OnClickListener() {
@@ -240,6 +250,8 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 .position(new LatLng(latLng.latitude, latLng.longitude))
                 .title("Problem"));
         mLatLng=latLng;
+        if(mBinding.buttonConfirm.getVisibility()==View.INVISIBLE)
+        mBinding.buttonConfirm.setVisibility(View.VISIBLE);
     }
     public void getCity()
     {
@@ -251,28 +263,27 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             if(adresses.isEmpty())
             {
 
-                LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent).getLatitude()),Double.parseDouble(levelList.get(mCurrent).getLongitude()));
+                LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()),Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
                 score(dbLatLng,mLatLng);
             }
             else {
 
                 String city = adresses.get(0).getLocality();
                 if(city==null)
-                    city="-";
-                Bundle bundle = adresses.get(0).getExtras();
+                    city="z";
                 Log.i(TAG, "getCity: "+city);
-                Log.i(TAG, "getCity: "+levelList.get(mCurrent).getCity());
-                if (city.equals(levelList.get(mCurrent).getCity()))
+                Log.i(TAG, "getCity: "+levelList.get(mCurrent-1).getCity());
+                if (city.equals(levelList.get(mCurrent-1).getCity()))
                     score_city();
                 else {
-                    LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent).getLatitude()), Double.parseDouble(levelList.get(mCurrent).getLongitude()));
+                    LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()), Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
                     score(dbLatLng, mLatLng);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("Bundle_error", e.toString());
-            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -294,15 +305,28 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void score(LatLng latLng1,LatLng latLng2)
     {
         float distance = getDistance(latLng1, latLng2);
-        long Score=50000-updateTime-(long) distance*10;
+        long Score=5000-(long)(updateTime*0.1)-(long) distance*2;
+        if(hint_pressed)
+            Score=Score-1000;
+        if(Score<0)
+            Score=0;
         mScore=mScore+Score;
-        mBinding.textViewScore.setText(String.valueOf(mScore));
+
+    //   Toast.makeText(getApplicationContext(),"Distance:"+String.valueOf(distance),Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(getApplicationContext(),"Current:"+String.valueOf(mCurrent),Toast.LENGTH_SHORT).show();
     }
     public void score_city()
     {
-        long Score=50000-updateTime;
+
+        long Score=5000-(long)(updateTime*0.1);
+        if(hint_pressed)
+            Score=Score-1000;
+        if(Score<0)
+            Score=0;
         mScore=mScore+Score;
-        mBinding.textViewScore.setText(String.valueOf(mScore));
+    //    mBinding.textViewScore.setText(String.valueOf(mScore));
+
+     //   Toast.makeText(getApplicationContext(),"Current:"+String.valueOf(mCurrent),Toast.LENGTH_SHORT).show();
     }
     Runnable updateTimerThread = new Runnable() {
         @Override
@@ -335,7 +359,20 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         startTime = SystemClock.uptimeMillis();
         customHandler.postDelayed(updateTimerThread,0);
     }
+    public void UpdateScore()
+    {
+        if(mScore>Long.parseLong(mHigscore))
+        {
+            Long overall=mScore-Long.parseLong(mHigscore)+Long.parseLong(mOverall);
+            String level = "level" + mLevel;
+            String key = FirebaseAuth.getInstance().getUid();
+            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("users").child(key)
+                    .child("scores");
+            myRef.child(level).setValue(mScore);
+            myRef.child("overall").setValue(overall);
 
+        }
+    }
 
 
     public class DataTask extends AsyncTask<Void, Void, List<Level>> {
@@ -426,21 +463,31 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
             if(integer==-1) {
                 mBinding.imageViewDb.setVisibility(View.INVISIBLE);
+                mBinding.imageViewClose.setVisibility(View.INVISIBLE);
                 Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
                 mCurrent=0;
+                UpdateScore();
             }
             else {
+          //      mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
+                mMap.clear();
+                hint_pressed=false;
                 mBinding.imageViewDb.setVisibility(View.VISIBLE);
                 mBinding.imageViewClose.setVisibility(View.VISIBLE);
+                if(mBinding.textViewHint.getVisibility()==View.VISIBLE) {
+                    mBinding.textViewHint.setVisibility(View.INVISIBLE);
+                    mBinding.imageViewHint.setVisibility(View.INVISIBLE);
+                }
+                mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
                 mBinding.textViewHint.setText(levelList.get(mCurrent).getHint());
                 Glide.with(getApplicationContext())
                         .load(integer)
                         .into(mBinding.imageViewDb);
 
-
                 mCurrent++;
 
                 Log.i(TAG, "onPostExecute: " + String.valueOf(mCurrent));
+                StartTimer();
             }
         }
     }
@@ -486,9 +533,27 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             mBinding.textViewScore.setVisibility(View.VISIBLE);
             mBinding.textViewTimer.setVisibility(View.VISIBLE);
             mBinding.buttonHint.setVisibility(View.VISIBLE);
-            mBinding.buttonConfirm.setVisibility(View.VISIBLE);
+      //      mBinding.buttonConfirm.setVisibility(View.VISIBLE);
             StartTimer();
 
+        }
+    }
+    public class ScoreTask extends AsyncTask<Void,Void,Void>
+    {
+
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getCity();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mBinding.textViewScore.setText(String.valueOf(mScore));
+           // StartTimer();
         }
     }
 }
