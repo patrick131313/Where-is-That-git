@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +32,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.data.Scores;
 import com.patrick.whereisthat.login.LoginActivity;
+import com.patrick.whereisthat.scores.ScoresActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
+import com.patrick.whereisthat.sprint.SprintActivity;
 
 import java.util.List;
 
@@ -41,6 +44,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth mFirebaseAuth;
+
+    private Button mSprint;
 
 
     @Override
@@ -57,7 +62,6 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
 
 
 
-
         if (mFirebaseAuth.getCurrentUser() != null) {
             getUsername(mFirebaseAuth.getUid());
             Log.d("Login", mFirebaseAuth.getUid());
@@ -67,6 +71,14 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                     .findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
             setUpNavDrawer();
+            mSprint=findViewById(R.id.button_sprint_mode);
+            mSprint.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent=new Intent(getApplicationContext(),SprintActivity.class);
+                    startActivity(intent);
+                }
+            });
 
 
 
@@ -135,8 +147,10 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.leaderboard_navigation_menu_item:
+                        Intent intent2=new Intent(getApplicationContext(), ScoresActivity.class);
+                        startActivity(intent2);
                         break;
-                    case R.id.invite_navigation_menu_item:
+                        case R.id.invite_navigation_menu_item:
                         break;
                     case R.id.settings_navigation_menu_item:
                         break;
