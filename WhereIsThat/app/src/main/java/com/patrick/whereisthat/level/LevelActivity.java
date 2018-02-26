@@ -55,7 +55,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
      */
     private static final boolean AUTO_HIDE = true;
     private GoogleMap mMap;
-    private GoogleMap mDmmyMap;
     private TextView mTime;
     long startTime = 0L;
     long timeInMilliseconds=0L;
@@ -246,9 +245,10 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void onMapClick(LatLng latLng) {
 
         mMap.clear();
+
         mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latLng.latitude, latLng.longitude))
-                .title("Problem"));
+                .position(new LatLng(latLng.latitude, latLng.longitude)));
+              //  .title("Problem"));
         mLatLng=latLng;
         if(mBinding.buttonConfirm.getVisibility()==View.INVISIBLE)
         mBinding.buttonConfirm.setVisibility(View.VISIBLE);
@@ -256,14 +256,13 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void getCity()
     {
         Geocoder geocoder;
+        LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()),Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
         List<Address> adresses;
         geocoder = new Geocoder(this);
         try {
             adresses = geocoder.getFromLocation(mLatLng.latitude, mLatLng.longitude, 1);
             if(adresses.isEmpty())
             {
-
-                LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()),Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
                 score(dbLatLng,mLatLng);
             }
             else {
@@ -276,14 +275,15 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 if (city.equals(levelList.get(mCurrent-1).getCity()))
                     score_city();
                 else {
-                    LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()), Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
+                    // LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()), Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
                     score(dbLatLng, mLatLng);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("Bundle_error", e.toString());
-         //   Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+            score(dbLatLng, mLatLng);
+            //   Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
 
         }
     }

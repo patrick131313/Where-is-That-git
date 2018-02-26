@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface SprintDao {
 
-    @Query("SELECT * FROM sprint ORDER BY RANDOM()")
+    @Query("SELECT * FROM sprint ORDER BY RANDOM() limit 20")
     List<Sprint> getSprint();
 
     @Insert

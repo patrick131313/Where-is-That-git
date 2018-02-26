@@ -63,7 +63,7 @@
             android:name=".sprint.SprintActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_sprint"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
     </application>
 
 </manifest>
