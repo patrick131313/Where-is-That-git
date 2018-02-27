@@ -24,6 +24,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.databinding.ActivityLevelBinding;
 import com.patrick.whereisthat.databinding.ActivitySprintBinding;
@@ -61,11 +67,12 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     boolean isFirst=true;
     ActivitySprintBinding mBinding;
     boolean isReady=false;
-    private Long mTimeRemaining;
+    private long mTimeRemaining;
     private CountDownTimer mCountDownTimer;
     private String mCurrent="DB";
     private long mScore=0;
     private LatLng mLatLng;
+    private boolean onDestroyCalled=false;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -141,6 +148,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mContentView = findViewById(R.id.map_sprint);
         new SprintTask().execute();
         new MapTask().execute();
+        mBinding.textViewCountdown.setText("2:00:00");
+
         mCountDownTimer=new CountDownTimer(120000, 1) {
 
             public void onTick(long millisUntilFinished) {
@@ -156,10 +165,14 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             }
 
             public void onFinish() {
-                Toast.makeText(getApplicationContext(),"Bwoooooooom",Toast.LENGTH_SHORT).show();
+
+
+               // Toast.makeText(getApplicationContext(),"Bwoooooooom",Toast.LENGTH_SHORT).show();
+                mBinding.textViewCountdown.setText("0:00:00");
+                CheckScore();
 
             }
-        }.start();
+        };
         mBinding.closeCitySprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -210,17 +223,55 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         // while interacting with the UI.
     }
 
+    public void CheckScore()
+    {
+        String key = FirebaseAuth.getInstance().getUid();
+
+        final DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("users").child(key).child("sprint_mode");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+            //    Log.i("CheckScore", "onDataChange: "+dataSnapshot.getValue().toString());
+                String  current_score=dataSnapshot.getValue().toString();
+                if(Long.parseLong(current_score)<mScore)
+                {
+                    myRef.setValue(mScore);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+       /* if(mScore>Long.parseLong(mHigscore))
+        {
+            Long overall=mScore-Long.parseLong(mHigscore)+Long.parseLong(mOverall);
+            String level = "level" + mLevel;
+          //  String key = FirebaseAuth.getInstance().getUid();
+            //DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("users").child(key)
+               //     .child("scores");
+            myRef.child(level).setValue(mScore);
+            myRef.child("overall").setValue(overall);
+
+        }*/
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mCountDownTimer.cancel();
         Log.i("OnDestroy", "onDestroy:called ");
-       if(mTask.getStatus()==AsyncTask.Status.RUNNING) {
+      /*  onDestroyCalled=true;
+        mCountDownTimer.onFinish();*/
+        if(mTask.getStatus()==AsyncTask.Status.RUNNING) {
             mTask.cancel(false);
          //   mTask.cancel(true);
-            if(mTask.isCancelled())
+      /*      if(mTask.isCancelled())
            {
                Log.i("OnDestroy", "onDestroy:cancelled ");
-           }
+           }*/
         }
     }
 
@@ -280,12 +331,15 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     @Override
     public void onMapClick(LatLng latLng) {
 
+
         mMap.clear();
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latLng.latitude, latLng.longitude)));
-        if(mBinding.buttonConfirmSprint.getVisibility()==View.INVISIBLE)
-            mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
-        mLatLng=latLng;
+        if(counter!=19) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(latLng.latitude, latLng.longitude)));
+            if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE)
+                mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
+            mLatLng = latLng;
+        }
         // if(mBinding.buttonConfirm.getVisibility()==View.INVISIBLE)
         //      mBinding.buttonConfirm.setVisibility(View.VISIBLE);
     }
@@ -317,6 +371,12 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mScore = mScore + 5000;
     }
 
+    public Boolean ContainsCyrillic(String s) {
+        for (int i = 0; i < s.length(); i++)
+            if (Character.UnicodeBlock.of(s.charAt(i)).equals(Character.UnicodeBlock.CYRILLIC))
+                return true;
+            return false;
+    }
     public void getCity()
     {
         Log.i("Aa", "getCity: Called");
@@ -414,7 +474,9 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             }
              mBinding.textViewSprint.setText(sprintList.get(0).getCity());
              mBinding.closeCitySprint.setVisibility(View.VISIBLE);
-            Toast.makeText(getApplicationContext(),String.valueOf(sprints.size()),Toast.LENGTH_SHORT).show();
+            mCountDownTimer.start();
+        //    Toast.makeText(getApplicationContext(),String.valueOf(sprints.size()),Toast.LENGTH_SHORT).show();
+         //
         }
     }
     public class MapTask extends AsyncTask<Void, Void, Integer>
@@ -440,6 +502,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             mTask=new MarkerTask().execute();
         }
     }
+
+
     public class MarkerTask extends AsyncTask<Void,Void,List<LatLng>> {
 
 
@@ -471,7 +535,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 try {
                     adresses = geocoder.getFromLocation(latLng1.latitude, latLng1.longitude, 1);
                     if (!adresses.isEmpty()) {
-                        if (adresses.get(0).getLocality() != null && !adresses.get(0).getLocality().contains(" ")) {
+                        if (adresses.get(0).getLocality() != null && !adresses.get(0).getLocality().contains(" ") && !ContainsCyrillic(adresses.get(0).getLocality()) ) {
                             Cities cities = new Cities(adresses.get(0).getLocality(), String.valueOf(latLng1.latitude), String.valueOf(latLng1.longitude));
                             mCities.add(cities);
                             latLngs.add(latLng1);
@@ -537,13 +601,30 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            mMap.clear();
-            mBinding.textViewSprint.setText(s);
-            mBinding.twRound.setText(String.valueOf(counter+1)+"/20");
-            mBinding.textViewSprint.setVisibility(View.VISIBLE);
-            mBinding.closeCitySprint.setVisibility(View.VISIBLE);
-            mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
-            mTask=new MarkerTask().execute();
+            if(counter==19)
+            {
+           //     Toast.makeText(getApplicationContext(),"Level completed"+mTimeRemaining/10,Toast.LENGTH_LONG).show();
+                mCountDownTimer.cancel();
+                mScore=mScore+mTimeRemaining/10;
+                mBinding.textViewSprintHs.setText(String.valueOf(mScore));
+                mCountDownTimer.onFinish();
+                mMap.clear();
+                mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
+                mBinding.textViewSprint.setVisibility(View.INVISIBLE);
+                mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
+                mBinding.twRound.setText(String.valueOf(counter + 1) + "/20");
+
+
+            }
+            else {
+                mMap.clear();
+                mBinding.textViewSprint.setText(s);
+                mBinding.twRound.setText(String.valueOf(counter + 1) + "/20");
+                mBinding.textViewSprint.setVisibility(View.VISIBLE);
+                mBinding.closeCitySprint.setVisibility(View.VISIBLE);
+                mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
+                mTask = new MarkerTask().execute();
+            }
         }
     }
     public class ScoreTask extends AsyncTask<Void,Void,Void>
