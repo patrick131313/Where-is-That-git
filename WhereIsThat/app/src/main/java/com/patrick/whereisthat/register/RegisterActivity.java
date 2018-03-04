@@ -106,7 +106,7 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                         else {
                             Log.d("Query", "You cand add this user");
-                            toastSuccesful();
+                            //toastSuccesful();
                             mFirebaseAuth.createUserWithEmailAndPassword(email, password).
                                     addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                                         @Override
@@ -119,8 +119,11 @@ public class RegisterActivity extends AppCompatActivity {
                                                 Map info = new HashMap<>();
                                                 info.put("user", user);
                                                 info.put("email", email);
+                                                Map level=new HashMap<>();
                                                 for (int i = 1; i < 12; i++)
-                                                    info.put("level" + String.valueOf(i), 0);
+                                                    level.put("level" + String.valueOf(i), 0);
+                                                level.put("overall",0);
+                                                userDb.child("scores").updateChildren(level);
                                                 info.put("sprint_mode", 0);
                                                 userDb.updateChildren(info);
                                             /*    Intent intent=new Intent(getApplication(), StartActivity.class);

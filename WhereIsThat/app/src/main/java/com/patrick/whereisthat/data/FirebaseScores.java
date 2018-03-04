@@ -8,9 +8,6 @@ import java.util.Map;
 
 public class FirebaseScores {
 
-
-
-
         private String email;
         private Map<String,Long> scores;
         private Long sprint_mode;
