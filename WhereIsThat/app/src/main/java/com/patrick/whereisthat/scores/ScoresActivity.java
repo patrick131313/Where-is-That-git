@@ -55,6 +55,7 @@ public class ScoresActivity extends AppCompatActivity {
         adapter.addFragment(new ScoreLevel9(),"Level9");
         adapter.addFragment(new ScoreLevel10(),"Level10");
         adapter.addFragment(new ScoreLevel11(),"Level11");
+        adapter.addFragment(new Overall(),"Overall");
         adapter.addFragment(new ScoreSprint(),"Sprint Mode");
         viewPager.setAdapter(adapter);
     }

@@ -34,6 +34,7 @@ import com.patrick.whereisthat.data.Scores;
 import com.patrick.whereisthat.login.LoginActivity;
 import com.patrick.whereisthat.scores.ScoresActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
+import com.patrick.whereisthat.settings.SettingsActivity;
 import com.patrick.whereisthat.sprint.SprintActivity;
 
 import java.util.List;
@@ -153,6 +154,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                         case R.id.invite_navigation_menu_item:
                         break;
                     case R.id.settings_navigation_menu_item:
+                        Intent intent3=new Intent(getApplicationContext(),SettingsActivity.class);
+                        startActivity(intent3);
                         break;
                     case R.id.logout_navigation_menu_item:
                        String title=item.getTitle().toString();

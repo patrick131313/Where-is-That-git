@@ -20,6 +20,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -335,7 +337,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mMap.clear();
         if(counter!=19) {
             mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latLng.latitude, latLng.longitude)));
+                    .position(new LatLng(latLng.latitude, latLng.longitude))
+            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
             if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE)
                 mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
             mLatLng = latLng;

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Notifications">
+    <SwitchPreferenceCompat
+        android:key="NotifSwitch"
+        android:summaryOn="On"
+        android:summaryOff="Off"
+        android:title="Notifications" />
+        <!-- android:icon="@drawable/ic_share_24dp" -->
+    </PreferenceCategory>
+<!--    <ListPreference
+        android:title="Pick your favourite color"
+        android:key="listPref"
+        android:defaultValue="4"
+        android:entries="@array/listArray"
+        android:entryValues="@array/listValues" /> -->
+
+
+    <PreferenceCategory android:title="Style">
+
+        <ListPreference
+            android:title="Select map style"
+            android:key="MapPref"
+            android:defaultValue="4"
+            android:entries="@array/listStyle"
+            android:entryValues="@array/listValues" />
+
+        <ListPreference
+            android:title="Select marker"
+            android:key="MarkerPef"
+            android:defaultValue="1"
+            android:entries="@array/listMarker"
+            android:entryValues="@array/listValuesMarker"
+            />
+       <!-- <CheckBoxPreference
+            android:id="@+id/checkbox_standard"
+            android:title="Standard"
+            android:defaultValue="1"
+            android:key="styleStandard"
+            android:icon="@drawable/ic_share_24dp"
+            />
+
+        <CheckBoxPreference
+            android:id="@+id/checkbox_silver"
+            android:title="Silver"
+            android:defaultValue="0"
+            android:key="styleSilver"
+            android:icon="@drawable/ic_share_24dp"
+            />
+        <CheckBoxPreference
+            android:id="@+id/checkbox_dark"
+            android:title="Dark"
+            android:defaultValue="0"
+            android:key="styleDark"
+            android:icon="@drawable/ic_share_24dp"
+            />
+        <CheckBoxPreference
+            android:id="@+id/checkbox_retro"
+            android:title="Retro"
+            android:defaultValue="0"
+            android:key="styleRetro"
+            android:icon="@drawable/ic_share_24dp"
+            /> -->
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Scores">
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

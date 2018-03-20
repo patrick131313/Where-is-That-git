@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="listStyle">
+        <item>Dark</item>
+        <item>Retro</item>
+        <item>Silver</item>
+        <item>Standard</item>
+    </string-array>
+
+    <string-array name="listMarker">
+        <item>Standard</item>
+        <item>Red Flag</item>
+        <item>Yellow Flag</item>
+        <item>Red Marker</item>
+        <item>Blue Marker</item>
+        <item>Red Thumbtack</item>
+    </string-array>
+
+    <string-array name="listValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="listValuesMarker">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+</resources>
