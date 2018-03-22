@@ -45,7 +45,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth mFirebaseAuth;
-
+    public static final String EXTRA_USERNAME="USERNAME_KEY";
+    private String mUser="";
     private Button mSprint;
 
 
@@ -149,6 +150,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                 switch (item.getItemId()) {
                     case R.id.leaderboard_navigation_menu_item:
                         Intent intent2=new Intent(getApplicationContext(), ScoresActivity.class);
+                        intent2.putExtra(EXTRA_USERNAME,mUser);
                         startActivity(intent2);
                         break;
                         case R.id.invite_navigation_menu_item:
@@ -198,6 +200,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                 //String userName=dataSnapshot.getValue().toString();
                // Log.d("MyRef",userName);
                 setUsername(dataSnapshot.getValue().toString());
+                mUser=dataSnapshot.getValue().toString();
             }
 
             @Override

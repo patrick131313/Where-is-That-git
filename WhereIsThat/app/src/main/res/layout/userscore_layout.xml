@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/text_view_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pozitia:"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/text_view_username"
+        />
+
+    <TextView
+        android:id="@+id/text_view_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User:"
+        android:layout_margin="8dp"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/text_view_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scor:"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_view_username"/>
+
+
+         <!--   app:layout_constraintLeft_toLeftOf="@+id/text_view_username"
+            app:layout_constraintRight_toRightOf="@+id/text_view_score" -->
+
+
+
+    -->
+</android.support.constraint.ConstraintLayout>

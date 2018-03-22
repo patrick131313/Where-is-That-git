@@ -2,12 +2,14 @@ package com.patrick.whereisthat.sprint;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,6 +47,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.prefs.Preferences;
 
 import javax.security.auth.login.LoginException;
 
@@ -75,6 +78,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private long mScore=0;
     private LatLng mLatLng;
     private boolean onDestroyCalled=false;
+    private SharedPreferences sharedPreferences;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -152,6 +156,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         new MapTask().execute();
         mBinding.textViewCountdown.setText("2:00:00");
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mCountDownTimer=new CountDownTimer(120000, 1) {
 
             public void onTick(long millisUntilFinished) {
@@ -223,6 +228,12 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     public void CheckScore()
@@ -338,7 +349,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         if(counter!=19) {
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude))
-            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            .icon(BitmapDescriptorFactory.fromResource(R.drawable.yellow_flag)));
             if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE)
                 mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
             mLatLng = latLng;
@@ -497,7 +508,27 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
             mMap.getUiSettings().setMapToolbarEnabled(false);
-            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
+            String map=sharedPreferences.getString("MapPref","4");
+            switch (map)
+            {
+                case "1":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
+                    break;
+                case "2":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    break;
+                case "3":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_silver));
+                    break;
+                case "4":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_standard));
+                    break;
+
+                default:break;
+
+            }
+           // Toast.makeText(this,String.valueOf(test),Toast.LENGTH_SHORT).show();
+           // mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
             LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);

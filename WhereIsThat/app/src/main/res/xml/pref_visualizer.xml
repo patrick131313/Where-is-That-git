@@ -6,6 +6,7 @@
         android:key="NotifSwitch"
         android:summaryOn="On"
         android:summaryOff="Off"
+        android:defaultValue="true"
         android:title="Notifications" />
         <!-- android:icon="@drawable/ic_share_24dp" -->
     </PreferenceCategory>

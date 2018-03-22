@@ -12,6 +12,7 @@ import com.patrick.whereisthat.scores.RecyclerViewAdapter;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,7 +45,9 @@ public class GetScores {
                     Log.i("Snapshot",snapshot.child("user").getValue().toString());
                     Log.i("ScoreList",scoreList.toString());
                 }
-                mRecylerViewAdapter.ReplaceData(scoreList);
+                final List<ScoresRank> finalList = new ArrayList<ScoresRank>(scoreList);
+                Collections.reverse(finalList);
+                mRecylerViewAdapter.ReplaceData(finalList);
             }
 
 
@@ -78,7 +81,9 @@ public class GetScores {
 
 
                 }
-                mRecylerViewAdapter.ReplaceData(scoreList);
+               final List<ScoresRank> finalList = new ArrayList<ScoresRank>(scoreList);
+                Collections.reverse(finalList);
+                mRecylerViewAdapter.ReplaceData(finalList);
             }
 
 

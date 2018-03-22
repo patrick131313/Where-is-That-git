@@ -25,7 +25,7 @@ public class Overall extends Fragment {
     RecyclerView mRecyclerView;
     RecyclerViewAdapter mRecylerViewAdapter;
     LinearLayoutManager mLayoutManager;
-
+    String mUser;
 
     public Overall()
     {
@@ -37,8 +37,8 @@ public class Overall extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View Overall=inflater.inflate(R.layout.scores_rv,container,false);
         mLayoutManager=new LinearLayoutManager(getContext());
-        mLayoutManager.setReverseLayout(true);
-        mLayoutManager.setStackFromEnd(true);
+     //   mLayoutManager.setReverseLayout(true);
+     //   mLayoutManager.setStackFromEnd(true);
         mRecyclerView=Overall.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
@@ -49,7 +49,8 @@ public class Overall extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRecylerViewAdapter=new RecyclerViewAdapter();
+        mUser=getArguments().getString("Username");
+        mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
         GetScores.getScoresLevel("overall",mRecylerViewAdapter);
         // getScoresLevel("level3");
 //        scoreListLevel1=GetScores.getScoresLevel("level1");

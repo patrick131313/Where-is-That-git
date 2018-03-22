@@ -21,6 +21,7 @@ public class ScoreLevel5 extends Fragment {
     RecyclerView mRecyclerView;
     RecyclerViewAdapter mRecylerViewAdapter;
     LinearLayoutManager mLayoutManager;
+    String mUser;
     public ScoreLevel5()
     {
 
@@ -31,9 +32,9 @@ public class ScoreLevel5 extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View ScoreLevel5=inflater.inflate(R.layout.scores_rv,container,false);
         mLayoutManager=new LinearLayoutManager(getContext());
-        mLayoutManager.setReverseLayout(true);
-        mLayoutManager.setStackFromEnd(true);
-        mRecyclerView=ScoreLevel5.findViewById(R.id.rw_scores);
+      //  mLayoutManager.setReverseLayout(true);
+     //   mLayoutManager.setStackFromEnd(true);
+       mRecyclerView=ScoreLevel5.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
         mRecyclerView.setHasFixedSize(true);
@@ -43,7 +44,8 @@ public class ScoreLevel5 extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRecylerViewAdapter=new RecyclerViewAdapter();
+        mUser=getArguments().getString("Username");
+        mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
         GetScores.getScoresLevel("level5",mRecylerViewAdapter);
     }
 }

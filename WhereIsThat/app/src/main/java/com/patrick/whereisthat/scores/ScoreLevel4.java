@@ -21,6 +21,7 @@ public class ScoreLevel4 extends android.support.v4.app.Fragment {
     RecyclerView mRecyclerView;
     RecyclerViewAdapter mRecylerViewAdapter;
     LinearLayoutManager mLayoutManager;
+    String mUser;
     public ScoreLevel4()
     {
 
@@ -31,8 +32,8 @@ public class ScoreLevel4 extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View ScoreLevel4=inflater.inflate(R.layout.scores_rv,container,false);
         mLayoutManager=new LinearLayoutManager(getContext());
-        mLayoutManager.setReverseLayout(true);
-        mLayoutManager.setStackFromEnd(true);
+     //   mLayoutManager.setReverseLayout(true);
+     //   mLayoutManager.setStackFromEnd(true);
         mRecyclerView=ScoreLevel4.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
@@ -43,7 +44,8 @@ public class ScoreLevel4 extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRecylerViewAdapter=new RecyclerViewAdapter();
+        mUser=getArguments().getString("Username");
+        mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
         GetScores.getScoresLevel("level4",mRecylerViewAdapter);
     }
 }

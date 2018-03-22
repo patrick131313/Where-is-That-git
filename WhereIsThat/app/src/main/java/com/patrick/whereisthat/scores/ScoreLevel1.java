@@ -28,6 +28,8 @@ import com.patrick.whereisthat.data.ScoresRank;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 /**
  * Created by Patrick on 3/2/2018.
  */
@@ -38,6 +40,7 @@ public class ScoreLevel1 extends Fragment {
     RecyclerView mRecyclerView;
     RecyclerViewAdapter mRecylerViewAdapter;
     LinearLayoutManager mLayoutManager;
+    String mUser;
 
 
     public ScoreLevel1()
@@ -45,24 +48,29 @@ public class ScoreLevel1 extends Fragment {
 
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View ScoreLevel1=inflater.inflate(R.layout.scores_rv,container,false);
         mLayoutManager=new LinearLayoutManager(getContext());
-        mLayoutManager.setReverseLayout(true);
-        mLayoutManager.setStackFromEnd(true);
+      //  mLayoutManager.setReverseLayout(true);
+     //   mLayoutManager.setStackFromEnd(true);
         mRecyclerView=ScoreLevel1.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
         mRecyclerView.setHasFixedSize(true);
+
+       // Log.i("Score", "onCreateView: "+mUser);
         return ScoreLevel1;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRecylerViewAdapter=new RecyclerViewAdapter();
+        mUser=getArguments().getString("Username");
+   //     mRecylerViewAdapter=new RecyclerViewAdapter();
+        mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
          GetScores.getScoresLevel("level1",mRecylerViewAdapter);
          // getScoresLevel("level3");
 //        scoreListLevel1=GetScores.getScoresLevel("level1");
@@ -82,40 +90,7 @@ public class ScoreLevel1 extends Fragment {
         Toast.makeText(getContext(),snapshot.toString(),Toast.LENGTH_LONG).show();
     }
 
-  /*  public void getScoresLevel(final String level)
-    {
-        //final List<ScoresRank> scoreList=new ArrayList<ScoresRank>();
-        ValueEventListener eventListener;
-        final DatabaseReference myRef= FirebaseDatabase.getInstance().getReference();
-        Query query=myRef.child("users").orderByChild("scores/"+level);
-        query.addListenerForSingleValueEvent(eventListener=new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                Log.i("Snapshot", "onDataChange: "+dataSnapshot.toString());
-                for(DataSnapshot snapshot:dataSnapshot.getChildren())
-                {
-
-                    Log.i("Snapshot",snapshot.toString());
-                    ScoresRank score=new ScoresRank(snapshot.child("user").getValue().toString(),snapshot.child("scores/"+level).getValue().toString());
-                    scoreListLevel1.add(score);
-
-                    Log.i("Snapshot",snapshot.child("scores/"+level).getValue().toString());
-                    Log.i("Snapshot",snapshot.child("user").getValue().toString());
-
-                }
-                Log.i("List",scoreListLevel1.toString());
-                mRecylerViewAdapter.ReplaceData(scoreListLevel1);
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }*/
 
 
 }
