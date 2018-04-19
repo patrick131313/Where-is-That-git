@@ -46,6 +46,6 @@ public class ScoreSprint extends Fragment {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
-        GetScores.getSprintScores(mRecylerViewAdapter);
+        GetScores.getSprintScores(mRecylerViewAdapter,mUser);
     }
 }

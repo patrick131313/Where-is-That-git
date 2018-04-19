@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,10 +27,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<ScoresRank> ranks=new ArrayList<ScoresRank>();
     private int mLastPosition=0;
     private int mLoggedUserPosition=0;
-    private int mLoggedUserScore=0;
     private String mLastScore="0";
     private String Username="";
-    private ViewHolder firstHolder;
+    android.support.v7.widget.SearchView searchView;
     public RecyclerViewAdapter(List<ScoresRank> ranks)
     {
         this.ranks=ranks;
@@ -49,65 +49,56 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Context context=parent.getContext();
         LayoutInflater inflater=LayoutInflater.from(context);
         if(viewType==0) {
-            view = inflater.inflate(R.layout.userscore_layout, parent, false);
+            if(!Username.equals("")) {
+                view = inflater.inflate(R.layout.userscore_layout, parent, false);
+                searchView = view.findViewById(R.id.search_view_user);
+            }
+            else
+            {
+                view = inflater.inflate(R.layout.search_layout, parent, false);
+                searchView = view.findViewById(R.id.search_view_user);
+            }
         }
         else {
             view = inflater.inflate(R.layout.score_item, parent, false);
         }
 
         ViewHolder viewHolder=new ViewHolder(view);
-        if(viewType==0)
-            firstHolder=viewHolder;
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        if(position !=0 && mLastPosition!=0 &&  mLastScore.equals(ranks.get(position-1).getScore().toString()))
-        {
-            holder.mScore.setText(String.valueOf(ranks.get(position-1).getScore().toString()));
-            holder.mUser.setText(mLastPosition+"."+ranks.get(position-1).getUser().toString());
-
-            if(ranks.get(position-1).getUser().toString().equals(Username))
-            {
-                firstHolder.mPosition.setText("Rank:"+String.valueOf(mLastPosition));
-                firstHolder.mScore.setText("Score:"+ranks.get(position-1).getScore().toString());
-                firstHolder.mUser.setText(Username);
-                Log.i("UserCheck", "onBindViewHolder: "+String.valueOf(mLoggedUserPosition));
-             // Toast.makeText(this,String.valueOf(mLoggedUserPosition),Toast.LENGTH_LONG).show();
-            }
-        }
-        else {
-            if (position != 0) {
-                mLastPosition = position;
-                mLastScore = ranks.get(position-1).getScore().toString();
-                Log.i("Scores", "onBindViewHolder: " + ranks.get(position-1).getScore().toString());
-                holder.mScore.setText(ranks.get(position-1).getScore().toString());
-                holder.mUser.setText(String.valueOf(position) + "." + ranks.get(position-1).getUser().toString());
-
-
-                if (ranks.get(position-1).getUser().toString().equals(Username)) {
-
-                    firstHolder.mPosition.setText("Rank:"+String.valueOf(position));
-                    firstHolder.mScore.setText("Score:"+ranks.get(position-1).getScore().toString());
-                    firstHolder.mUser.setText(Username);
-                    Log.i("UserCheck", "onBindViewHolder: " + String.valueOf(mLoggedUserPosition));
-                }
-            }
-        }
+      if(position!=0)
+      {
+          holder.mUser.setText(ranks.get(position-1).getUser().toString());
+          holder.mScore.setText(ranks.get(position-1).getScore().toString());
+          holder.mPosition.setText(String.valueOf(ranks.get(position-1).getPosition())+" ");
+      }
+      else
+      {
+          if(!Username.equals("")) {
+              holder.mUser.setText(ranks.get(ranks.size() - 1).getUser().toString());
+              holder.mScore.setText("Score:" + ranks.get(ranks.size() - 1).getScore().toString());
+              holder.mPosition.setText("Rank:" + String.valueOf(ranks.get(ranks.size() - 1).getPosition()));
+          }
+      }
     }
     public void ReplaceData(List<ScoresRank> ranks)
     {
         this.ranks=ranks;
         this.notifyDataSetChanged();
-     //   mRecylerViewAdapter.notifyDataSetChanged();
+
     }
 
     @Override
     public int getItemCount() {
-        //return 15;
-        return ranks.size()+1;
+
+        if(Username.equals(""))
+            return ranks.size()+1;
+        else
+            return ranks.size();
     }
 
     @Override
@@ -117,7 +108,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return 0;
         else
             return 1;
-     //   return super.getItemViewType(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -125,6 +115,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         TextView mUser;
         TextView mScore;
         TextView mPosition;
+
 
         public ViewHolder(View itemView) {
             super(itemView);

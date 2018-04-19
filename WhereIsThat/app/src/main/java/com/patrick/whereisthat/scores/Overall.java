@@ -51,7 +51,7 @@ public class Overall extends Fragment {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
-        GetScores.getScoresLevel("overall",mRecylerViewAdapter);
+        GetScores.getScoresLevel("overall",mRecylerViewAdapter,mUser);
         // getScoresLevel("level3");
 //        scoreListLevel1=GetScores.getScoresLevel("level1");
         //    scoreListLevel1.add(new ScoresRank("aaaa","111"));
@@ -70,5 +70,8 @@ public class Overall extends Fragment {
         Toast.makeText(getContext(),snapshot.toString(),Toast.LENGTH_LONG).show();
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

@@ -46,6 +46,6 @@ public class ScoreLevel5 extends Fragment {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
-        GetScores.getScoresLevel("level5",mRecylerViewAdapter);
+        GetScores.getScoresLevel("level5",mRecylerViewAdapter,mUser);
     }
 }

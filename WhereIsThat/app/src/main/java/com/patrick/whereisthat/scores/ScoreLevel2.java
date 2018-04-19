@@ -47,6 +47,6 @@ public class ScoreLevel2 extends android.support.v4.app.Fragment {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
-        GetScores.getScoresLevel("level2",mRecylerViewAdapter);
+        GetScores.getScoresLevel("level2",mRecylerViewAdapter,mUser);
     }
 }

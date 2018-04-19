@@ -53,16 +53,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       /*setContentView(R.layout.activity_start);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        setUpNavDrawer();*/
 
          mFirebaseAuth = FirebaseAuth.getInstance();
-
-
 
         if (mFirebaseAuth.getCurrentUser() != null) {
             getUsername(mFirebaseAuth.getUid());
@@ -230,6 +222,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
         MenuItem item=menu.findItem(R.id.logout_navigation_menu_item);
         item.setTitle("Login");
         item.setIcon(ContextCompat.getDrawable(this,R.drawable.ic_login_24dp));
+        mUser="";
        /* item.setTitle("Tezd");
         item.setIcon(ContextCompat.getDrawable(this,R.drawable.ic_share_24dp));*/
     }
