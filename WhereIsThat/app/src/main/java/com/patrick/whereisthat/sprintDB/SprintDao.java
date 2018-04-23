@@ -16,6 +16,8 @@ public interface SprintDao {
 
     @Query("SELECT * FROM sprint ORDER BY RANDOM() limit 20")
     List<Sprint> getSprint();
+    @Query("SELECT * FROM sprint ORDER BY RANDOM() limit 21")
+    List<Sprint> getSprint21();
 
     @Insert
     void insertAll(List<Sprint> sprints );
