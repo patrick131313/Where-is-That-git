@@ -2,6 +2,7 @@ package com.patrick.whereisthat.sprint;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.location.Address;
@@ -74,12 +75,15 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     ActivitySprintBinding mBinding;
     boolean isReady=false;
     private long mTimeRemaining;
-    private CountDownTimer mCountDownTimer;
+    private long mTime=120000;
+    public CountDownTimer mCountDownTimer;
     private String mCurrent="DB";
     private long mScore=0;
     private LatLng mLatLng;
     private boolean onDestroyCalled=false;
     private SharedPreferences sharedPreferences;
+    private float mDistance;
+    private long mScoreRound=0;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -156,31 +160,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         new SprintTask().execute();
         new MapTask().execute();
         mBinding.textViewCountdown.setText("2:00:00");
-
+        StartTimer();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mCountDownTimer=new CountDownTimer(120000, 1) {
-
-            public void onTick(long millisUntilFinished) {
-                int secs = (int)(millisUntilFinished/1000);
-                int mins = secs/60;
-                secs%=60;
-                int miliseconds = (int)(millisUntilFinished%1000);
-                miliseconds=miliseconds/10;
-                mBinding.textViewCountdown.setText(""+mins+":"+String.format("%02d",secs)+":"
-                        +String.format("%02d",miliseconds));
-                mTimeRemaining=millisUntilFinished;
-
-            }
-
-            public void onFinish() {
-
-
-                // Toast.makeText(getApplicationContext(),"Bwoooooooom",Toast.LENGTH_SHORT).show();
-                mBinding.textViewCountdown.setText("0:00:00");
-                CheckScore();
-
-            }
-        };
         mBinding.closeCitySprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -203,39 +184,71 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 if(counter==20)
                 {
                     Toast.makeText(getApplicationContext(),"Sprint completed",Toast.LENGTH_LONG).show();
+                    mCountDownTimer.onFinish();
                 }
                 else {
                     new ScoreTask().execute();
                     new NextCityTask().execute();
-                    //  Dialog mDialog=new Dialog();
-                    //    mDialog.show(getSupportFragmentManager(),"aaa");
+             //       mCountDownTimer.onFinish();
+               //    mTime=mTimeRemaining;
+
                 }
             }
         });
-       /* if(mCities.size()-1<counter)
-        {
-           // mBinding.buttonConfirmSprint.setText(sprintList.get(counter).getCity());
-            mBinding.buttonConfirmSprint.setText("Not ready");
-        }
-        else {
-         //   mBinding.buttonConfirmSprint.setText(mCities.get(counter).getCity());
-            mBinding.buttonConfirmSprint.setText("Not ready random");
-        }*/
-        //mTask=new MarkerTask().execute();
-
-
-
-
         // Set up the user interaction to manually show or hide the system UI.
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
     }
+    public void StartTimer()
+    {
+        mCountDownTimer=new CountDownTimer(mTime, 1) {
 
+            public void onTick(long millisUntilFinished) {
+
+                int secs = (int)(millisUntilFinished/1000);
+                int mins = secs/60;
+                secs%=60;
+                int miliseconds = (int)(millisUntilFinished%1000);
+                miliseconds=miliseconds/10;
+                mBinding.textViewCountdown.setText(""+mins+":"+String.format("%02d",secs)+":"
+                        +String.format("%02d",miliseconds));
+                mTimeRemaining=millisUntilFinished;
+
+            }
+
+
+            public void onFinish() {
+
+
+              //  if(mTimeRemaining<=10 || counter==20)
+            //    {
+                    Log.i("OnFinish", "Game finished");
+                    CheckScore();
+                    mBinding.textViewCountdown.setText("0:00:00");
+                //    mBinding.textViewCountdown.setVisibility(View.INVISIBLE);
+
+          //      }
+           /*     else
+                {
+                    Log.i("OnFinish", "Called");
+                    mBinding.textViewCountdown.setText("0:00:00");
+                    mCountDownTimer.cancel();
+
+                }*/
+                // Toast.makeText(getApplicationContext(),"Bwoooooooom",Toast.LENGTH_SHORT).show();
+
+
+            }
+
+
+        };
+    }
     @Override
     protected void onResume() {
         super.onResume();
+
 
     }
 
@@ -261,17 +274,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
 
-       /* if(mScore>Long.parseLong(mHigscore))
-        {
-            Long overall=mScore-Long.parseLong(mHigscore)+Long.parseLong(mOverall);
-            String level = "level" + mLevel;
-          //  String key = FirebaseAuth.getInstance().getUid();
-            //DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("users").child(key)
-               //     .child("scores");
-            myRef.child(level).setValue(mScore);
-            myRef.child("overall").setValue(overall);
 
-        }*/
     }
 
     @Override
@@ -372,12 +375,14 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         distance = locationA.distanceTo(locationB) * 100;
         int km = ((int) distance) / 1000;
         float kmtot = km;
+        mDistance=kmtot/100;
         return kmtot / 100;
     }
     public void score(LatLng latLng1,LatLng latLng2)
     {
         float distance = getDistance(latLng1, latLng2);
         long Score=5000-(long) distance*2;
+        mScoreRound=Score;
         mScore=mScore+Score;
 
 
@@ -457,6 +462,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         }
     }
+
+
 
     public class SprintTask extends AsyncTask <Void,Void,List<Sprint>> //select din baza de date
     {
@@ -602,13 +609,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         protected void onPostExecute(List<LatLng> latLngs) {
             if(isCancelled())
                 return;
-           /* Log.i("ONpost", String.valueOf(latLngs.size()));
-            super.onPostExecute(latLngs);
-            for(int i=0;i<latLngs.size();i++)
-            {
-                mMap.addMarker(new MarkerOptions()
-                        .position(latLngs.get(i)));
-            }*/
         }
     }
     public class NextCityTask extends AsyncTask<Void,Void,String> //trecere la orasul urmator
@@ -620,7 +620,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             {
                 if(mCities.size()-2<counter)
                 {
-                    // mText.setText("Al "+String.valueOf(counter+1)+" lea dupa baza da date");
+
                   counter++;
                     mCurrent="DB";
                     return sprintList.get(counter).getCity()+"Baza de date";
@@ -682,7 +682,21 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             // mBinding.te.setText(String.valueOf(mScore));
+            Bundle bundle=new Bundle();
+            bundle.putInt("Round",counter);
+            bundle.putFloat("Distance",mDistance);
+            bundle.putLong("Score",mScoreRound);
+            bundle.putLong("Total",mScore);
+
+            Dialog mDialog=new Dialog();
+            mDialog.setArguments(bundle);
+           // mCountDownTimer.cancel();
+           // mCountDownTimer.onFinish();
+            mDialog.show(getSupportFragmentManager(),"aaa");
             mBinding.textViewSprintHs.setText(String.valueOf(mScore));
+
+            /*StartTimer();
+            mCountDownTimer.start();*/
             // StartTimer();
         }
     }

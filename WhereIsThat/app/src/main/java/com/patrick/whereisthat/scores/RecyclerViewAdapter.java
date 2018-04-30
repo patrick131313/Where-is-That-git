@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,18 +24,23 @@ import java.util.List;
  * Created by Patrick on 3/2/2018.
  */
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> implements Filterable {
 
     private List<ScoresRank> ranks=new ArrayList<ScoresRank>();
+    private List<ScoresRank> mArray=new ArrayList<ScoresRank>();
+    private List<ScoresRank> mArrayFiltered=new ArrayList<ScoresRank>();
     private int mLastPosition=0;
     private int mLoggedUserPosition=0;
     private String mLastScore="0";
     private String Username="";
-    android.support.v7.widget.SearchView searchView;
-    public RecyclerViewAdapter(List<ScoresRank> ranks)
+    private SearchView searchView;
+    private RecyclerViewAdapter mAdapter;
+    private ScoresRank userLogged;
+ /*   public RecyclerViewAdapter(List<ScoresRank> ranks)
     {
-        this.ranks=ranks;
-    }
+        this.mArrayFiltered=ranks;
+        this.mArray=ranks;
+    }*/
     public RecyclerViewAdapter(){
 
     }
@@ -42,6 +49,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     {
         this.Username=Username;
 
+
+    }
+    public void TransferAdapter(RecyclerViewAdapter mAdapter)
+    {
+        this.mAdapter=mAdapter;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,6 +70,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 view = inflater.inflate(R.layout.search_layout, parent, false);
                 searchView = view.findViewById(R.id.search_view_user);
             }
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    mAdapter.getFilter().filter(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                  mAdapter.getFilter().filter(s);
+                    return false;
+                }
+            });
         }
         else {
             view = inflater.inflate(R.layout.score_item, parent, false);
@@ -70,24 +95,43 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-      if(position!=0)
-      {
-          holder.mUser.setText(ranks.get(position-1).getUser().toString());
-          holder.mScore.setText(ranks.get(position-1).getScore().toString());
-          holder.mPosition.setText(String.valueOf(ranks.get(position-1).getPosition())+" ");
-      }
-      else
-      {
-          if(!Username.equals("")) {
-              holder.mUser.setText(ranks.get(ranks.size() - 1).getUser().toString());
-              holder.mScore.setText("Score:" + ranks.get(ranks.size() - 1).getScore().toString());
-              holder.mPosition.setText("Rank:" + String.valueOf(ranks.get(ranks.size() - 1).getPosition()));
+        if(position!=0) {
+           if (mArrayFiltered.size() != 0) {
+                holder.mUser.setText(mArrayFiltered.get(position-1).getUser().toString());
+                holder.mScore.setText(mArrayFiltered.get(position-1).getScore().toString());
+                holder.mPosition.setText(String.valueOf(mArrayFiltered.get(position-1).getPosition()) + " ");
           }
-      }
+        }
+        else
+        {
+            if(!Username.equals("") &&mArray.size()>0) {
+                holder.mUser.setText(mArray.get(mArray.size() - 1).getUser().toString());
+                holder.mScore.setText("Score:" + mArray.get(mArray.size() - 1).getScore().toString());
+                holder.mPosition.setText("Rank:" + String.valueOf(mArray.get(mArray.size() - 1).getPosition()));
+          /*      holder.mUser.setText(userLogged.getUser().toString());
+                holder.mScore.setText("Score:" + userLogged.getScore().toString());
+                holder.mPosition.setText("Rank:" +userLogged.getPosition());*/
+            }
+
+
+        }
     }
     public void ReplaceData(List<ScoresRank> ranks)
     {
-        this.ranks=ranks;
+        this.mArrayFiltered=ranks;
+        this.mArray=ranks;
+        Log.i("ArraySize", String.valueOf(mArray.size()));
+
+       /* if(!Username.equals(""))
+        {
+            userLogged=new ScoresRank(mArray.get(mArray.size()-1).getUser(),mArray.get(mArray.size()-1).getScore(),mArray.get(mArray.size()-1).getPosition());
+            mArray.remove(mArray.size()-1);
+
+            mArrayFiltered.remove((mArrayFiltered.size())-1);
+
+
+        }
+        Log.i("ArraySize", String.valueOf(mArray.size()));*/
         this.notifyDataSetChanged();
 
     }
@@ -95,11 +139,28 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public int getItemCount() {
 
-        if(Username.equals(""))
-            return ranks.size()+1;
-        else
-            return ranks.size();
+       if(Username.equals(""))
+            return mArrayFiltered.size()+1;
+        else {
+
+            if(mArrayFiltered.size()==0)
+                return 1;
+            else {
+                if (mArrayFiltered.size() != 0 && mArrayFiltered.size() != mArray.size()) {
+                    if(mArrayFiltered.size()==2 && mArrayFiltered.get(0).getUser().equals( mArrayFiltered.get(1).getUser()))
+                        return 2;
+                    return mArrayFiltered.size() + 1;
+                } else {
+                    return mArrayFiltered.size();
+                }
+            }
+        }
+
+
+
+
     }
+
 
     @Override
     public int getItemViewType(int position) {
@@ -108,6 +169,54 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             return 0;
         else
             return 1;
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    mArrayFiltered = mArray;
+                } else {
+                    List<ScoresRank> arrayList = new ArrayList<ScoresRank>();
+                    for (ScoresRank string : mArray) {
+                        if (string.getUser().toLowerCase().contains(charString.toLowerCase()) || string.getUser().contains(charSequence)) {
+                            arrayList.add(string);
+                        }
+                    }
+     /*               if (!Username.equals("")) {
+                        Log.i("FilterUser", Username.toString());
+                        arrayList.add(new ScoresRank("1", "11", 0));
+                        if (arrayList.get(arrayList.size() - 2).getUser().equals(Username))
+                            arrayList.remove(arrayList.size() - 2);*/
+                        mArrayFiltered = arrayList;
+                 //   }
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mArrayFiltered;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mArrayFiltered = (List<ScoresRank>) filterResults.values;
+               for (ScoresRank string : mArrayFiltered) {
+                    Log.i("Filter", string.getUser());
+
+
+                }
+                Log.i("Filter", "----------");
+
+
+             /*   if(!Username.equals(""))
+                {
+                    mArrayFiltered.remove(mArrayFiltered.size()-1);
+                }*/
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

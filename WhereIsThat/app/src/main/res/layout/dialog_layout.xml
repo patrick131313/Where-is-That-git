@@ -1,32 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_marginRight="15dp"
+    android:layout_marginLeft="15dp"
+    android:padding="15dp">
+
+
     <TextView
-        android:id="@+id/dialog_round"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Round"
-        />
-    <TextView
-        android:id="@+id/dialog_distance"
-        android:layout_width="wrap_content"
+        android:textSize="21sp"
+        android:textColor="@color/colorBlack"
+        android:id="@+id/dialogRound"/>
+
+    <!--<TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Km"
-        app:layout_constraintLeft_toRightOf="@+id/dialog_round"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_round"
-        />
-
+        android:text="Time:"
+        android:id="@+id/dialogTime"
+        android:textSize="20sp"
+        android:layout_marginTop="5dp"/>-->
     <TextView
-        android:id="@+id/dialog_score"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="122345"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_distance"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+        android:text="Distance:"
+        android:id="@+id/dialogDistance"
+        android:textSize="20sp"
+        android:layout_marginTop="5dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Score:"
+        android:id="@+id/dialogScore"
+        android:textSize="20sp"
+        android:layout_marginTop="5dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total score:"
+        android:id="@+id/dialogTotal"
+        android:textSize="20sp"
+        android:layout_marginTop="5dp"/>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorBlack"
+            android:text="Quit"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/dialogQuit"/>
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorBlack"
+            android:text="Continue"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/dialogContinue"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

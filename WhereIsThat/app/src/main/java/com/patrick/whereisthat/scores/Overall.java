@@ -51,6 +51,7 @@ public class Overall extends Fragment {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
+        mRecylerViewAdapter.TransferAdapter(mRecylerViewAdapter);
         GetScores.getScoresLevel("overall",mRecylerViewAdapter,mUser);
         // getScoresLevel("level3");
 //        scoreListLevel1=GetScores.getScoresLevel("level1");
