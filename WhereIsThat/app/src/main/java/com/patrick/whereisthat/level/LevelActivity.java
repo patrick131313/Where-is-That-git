@@ -2,12 +2,14 @@ package com.patrick.whereisthat.level;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -77,6 +79,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     private String mOverall;
     private boolean hint_pressed=false;
     private float mDistance;
+    private SharedPreferences sharedPreferences;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -141,7 +144,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
      //   mImageView=findViewById(R.id.image_view_db);
       //  mConfirm=findViewById(R.id.button_confirm);
 
-
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mLevel=getIntent().getStringExtra(SelectLevelActivity.EXTRA_LEVEL_KEY);
         mHigscore= getIntent().getStringExtra(SelectLevelActivity.EXTRA_HIGHSCORE_KEY);
         mOverall=getIntent().getStringExtra(SelectLevelActivity.EXTRA_OVERALL_KEY);
@@ -515,7 +518,26 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
             mMap.getUiSettings().setMapToolbarEnabled(false);
-            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
+            String map=sharedPreferences.getString("MapPref","4");
+            switch (map)
+            {
+                case "1":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
+                    break;
+                case "2":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    break;
+                case "3":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_silver));
+                    break;
+                case "4":
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_standard));
+                    break;
+
+                default:break;
+
+            }
+          //  mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
             LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);

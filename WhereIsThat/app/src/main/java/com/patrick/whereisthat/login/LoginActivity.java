@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.StartActivity;
+import com.patrick.whereisthat.dialog.DialogResetPassword;
 import com.patrick.whereisthat.register.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity {
@@ -25,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPassword;
     private Button mLogin;
     private FirebaseAuth mFirebaseAuth;
+    private TextView resetPassword;
     private Button mRegister;
 
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -82,6 +85,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(getApplication(), RegisterActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        resetPassword = findViewById(R.id.tv_forgot_password);
+        resetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogResetPassword dialog = new DialogResetPassword();
+                dialog.show(getSupportFragmentManager(), "dialog_password_reset");
             }
         });
 
