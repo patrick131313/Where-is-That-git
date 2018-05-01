@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.databinding.ActivityLevelBinding;
+import com.patrick.whereisthat.dialog.DialogLevel;
 import com.patrick.whereisthat.levelsDB.Level;
 import com.patrick.whereisthat.levelsDB.LevelDao;
 import com.patrick.whereisthat.levelsDB.LevelDatabase;
@@ -71,9 +72,12 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     ActivityLevelBinding mBinding;
     private LatLng mLatLng;
     private long mScore=0;
+    private long mScoreRound;
     private String mHigscore;
     private String mOverall;
     private boolean hint_pressed=false;
+    private float mDistance;
+
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -300,6 +304,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         distance = locationA.distanceTo(locationB) * 100;
         int km = ((int) distance) / 1000;
         float kmtot = km;
+        mDistance=kmtot/100;
         return kmtot / 100;
     }
     public void score(LatLng latLng1,LatLng latLng2)
@@ -310,6 +315,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             Score=Score-1000;
         if(Score<0)
             Score=0;
+        mScoreRound=Score;
         mScore=mScore+Score;
 
     //   Toast.makeText(getApplicationContext(),"Distance:"+String.valueOf(distance),Toast.LENGTH_SHORT).show();
@@ -323,7 +329,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             Score=Score-1000;
         if(Score<0)
             Score=0;
+        mScoreRound=Score;
         mScore=mScore+Score;
+        mDistance=0;
     //    mBinding.textViewScore.setText(String.valueOf(mScore));
 
      //   Toast.makeText(getApplicationContext(),"Current:"+String.valueOf(mCurrent),Toast.LENGTH_SHORT).show();
@@ -487,7 +495,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 mCurrent++;
 
                 Log.i(TAG, "onPostExecute: " + String.valueOf(mCurrent));
-                StartTimer();
+              //  StartTimer();
             }
         }
     }
@@ -553,6 +561,18 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             mBinding.textViewScore.setText(String.valueOf(mScore));
+            DialogLevel mDialog=new DialogLevel();
+            Bundle bundle=new Bundle();
+            bundle.putInt("Round",mCurrent);
+            bundle.putLong("Time",updateTime);
+            bundle.putLong("RoundScore",mScoreRound);
+            bundle.putLong("Score",mScore);
+            bundle.putFloat("Distance",mDistance);
+            mDialog.setArguments(bundle);
+            //mDialog.setArguments(bundle);
+            // mCountDownTimer.cancel();
+            // mCountDownTimer.onFinish();
+            mDialog.show(getSupportFragmentManager(),"aaa");
            // StartTimer();
         }
     }

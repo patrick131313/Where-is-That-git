@@ -391,6 +391,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     {
 
         mScore = mScore + 5000;
+        mScoreRound=5000;
+        mDistance=0;
     }
 
     public Boolean ContainsCyrillic(String s) {
