@@ -42,6 +42,8 @@ public class SelectLevelActivity extends AppCompatActivity {
     public static final String EXTRA_LEVEL_KEY="LEVEL_KEY";
     public static final String EXTRA_HIGHSCORE_KEY="HIGHSCORE_KEY";
     public static final String EXTRA_OVERALL_KEY="OVERALL_KEY";
+    private int mLastPlayed;
+    private long prevLevel;
 
     private String []mArrayLevels={"Level1:11","Level2:22","Level3:33","Level4:44","Level5:55","Level6:66",
             "Level7:77","Level8:88","Level9:99","Level10:100","Level11:111"};
@@ -125,16 +127,39 @@ public class SelectLevelActivity extends AppCompatActivity {
             {
                 final Object score=mHighscores.get("level"+String.valueOf(position+1));
                 holder.mHighscore.setText("Higscore:"+score.toString());
+                if(position!=0)
+                {
+                    Object prev = mHighscores.get("level" + String.valueOf(position));
+                    prevLevel = (Long) prev;
+                }
+                if ((position == 0) || (position != 0 && prevLevel != 0)) {
+                    mLastPlayed = position + 1;
+                }
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                      // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
-                        Intent intent=new Intent(getApplicationContext(), LevelActivity.class);
-                        intent.putExtra(EXTRA_LEVEL_KEY,String.valueOf(position+1));
-                        intent.putExtra(EXTRA_HIGHSCORE_KEY,score.toString());
-                        intent.putExtra(EXTRA_OVERALL_KEY,mHighscores.get("overall").toString());
-                        startActivity(intent);
+                        // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
+                        Object prev = mHighscores.get("level" + String.valueOf(position));
+                        if(position+1<=mLastPlayed)
+                        {
+                            Intent intent = new Intent(getApplicationContext(), LevelActivity.class);
+                            intent.putExtra(EXTRA_LEVEL_KEY, String.valueOf(position + 1));
+                            intent.putExtra(EXTRA_HIGHSCORE_KEY, score.toString());
+                            intent.putExtra(EXTRA_OVERALL_KEY, mHighscores.get("overall").toString());
+                            startActivity(intent);
+                        }
+                        else
+                        {
+                            if(mLastPlayed!=0)
+                            Toast.makeText(getApplicationContext(),"You can't play this level now,complete level " +String.valueOf(mLastPlayed)
+                                    ,Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(getApplicationContext(),"You can't play this level now"
+                                        ,Toast.LENGTH_LONG).show();
+
+                        }
                     }
+
                 });
             }
 

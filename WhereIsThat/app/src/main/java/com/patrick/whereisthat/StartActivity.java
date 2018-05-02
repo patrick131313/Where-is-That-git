@@ -69,8 +69,14 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
             mSprint.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent=new Intent(getApplicationContext(),SprintActivity.class);
-                    startActivity(intent);
+                    if(!mUser.equals("")) {
+                        Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
+                        startActivity(intent);
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(),"You must be logged to play",Toast.LENGTH_LONG).show();
+                    }
                 }
             });
 
@@ -121,9 +127,14 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     }
     public void startGameClick(View view){
 
-        Intent intent=new Intent(getApplication(),SelectLevelActivity.class);
-        startActivity(intent);
-
+        if(!mUser.equals("")) {
+            Intent intent = new Intent(getApplication(), SelectLevelActivity.class);
+            startActivity(intent);
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),"You must be logged to play",Toast.LENGTH_LONG).show();
+        }
     }
     public void setUpNavDrawer()
     {
