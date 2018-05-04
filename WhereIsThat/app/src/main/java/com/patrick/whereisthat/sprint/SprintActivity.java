@@ -84,6 +84,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private SharedPreferences sharedPreferences;
     private float mDistance;
     private long mScoreRound=0;
+    private boolean isFinished=false;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -181,7 +182,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     }
                 }
 
-                if(counter==20)
+                if(counter==20 || isFinished)
                 {
                     Toast.makeText(getApplicationContext(),"Sprint completed",Toast.LENGTH_LONG).show();
                     mCountDownTimer.onFinish();
@@ -221,23 +222,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
             public void onFinish() {
 
-
-              //  if(mTimeRemaining<=10 || counter==20)
-            //    {
                     Log.i("OnFinish", "Game finished");
                     CheckScore();
                     mBinding.textViewCountdown.setText("0:00:00");
-                //    mBinding.textViewCountdown.setVisibility(View.INVISIBLE);
-
-          //      }
-           /*     else
-                {
-                    Log.i("OnFinish", "Called");
-                    mBinding.textViewCountdown.setText("0:00:00");
-                    mCountDownTimer.cancel();
-
-                }*/
-                // Toast.makeText(getApplicationContext(),"Bwoooooooom",Toast.LENGTH_SHORT).show();
+                    isFinished=true;
 
 
             }
@@ -352,7 +340,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
         mMap.clear();
-        if(counter!=21) {
+        if(counter!=21 || !isFinished) {
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.yellow_flag)));
@@ -618,7 +606,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         @Override
         protected String doInBackground(Void... voids) {
-            if(counter<20)
+            if(counter<20 || !isFinished)
             {
                 if(mCities.size()-2<counter)
                 {
@@ -659,13 +647,21 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
             else {
-                mMap.clear();
-                mBinding.textViewSprint.setText(s);
-                mBinding.twRound.setText(String.valueOf(counter + 1) + "/20");
-                mBinding.textViewSprint.setVisibility(View.VISIBLE);
-                mBinding.closeCitySprint.setVisibility(View.VISIBLE);
-                mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
-                mTask = new MarkerTask().execute();
+                if (isFinished) {
+                    mBinding.textViewSprintHs.setText(String.valueOf(mScore));
+                    mMap.clear();
+                    mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
+                    mBinding.textViewSprint.setVisibility(View.INVISIBLE);
+                    mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
+                } else {
+                    mMap.clear();
+                    mBinding.textViewSprint.setText(s);
+                    mBinding.twRound.setText(String.valueOf(counter + 1) + "/20");
+                    mBinding.textViewSprint.setVisibility(View.VISIBLE);
+                    mBinding.closeCitySprint.setVisibility(View.VISIBLE);
+                    mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
+                    mTask = new MarkerTask().execute();
+                }
             }
         }
     }

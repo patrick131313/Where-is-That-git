@@ -47,49 +47,46 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     private FirebaseAuth mFirebaseAuth;
     public static final String EXTRA_USERNAME="USERNAME_KEY";
     private String mUser="";
-    private Button mSprint;
+    private TextView textView;
 
+    private Button mSprint;
+    private boolean mInit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_start);
          mFirebaseAuth = FirebaseAuth.getInstance();
-
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        setUpNavDrawer();
+        mSprint=findViewById(R.id.button_sprint_mode);
+        textView=findViewById(R.id.textView_user);
+        textView.setVisibility(View.INVISIBLE);
+        mSprint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!mUser.equals("")) {
+                    Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"You must be logged to play",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         if (mFirebaseAuth.getCurrentUser() != null) {
             getUsername(mFirebaseAuth.getUid());
+            mInit=true;
             Log.d("Login", mFirebaseAuth.getUid());
-            setContentView(R.layout.activity_start);
-            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-            setUpNavDrawer();
-            mSprint=findViewById(R.id.button_sprint_mode);
-            mSprint.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(!mUser.equals("")) {
-                        Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
-                        startActivity(intent);
-                    }
-                    else
-                    {
-                        Toast.makeText(getApplicationContext(),"You must be logged to play",Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-
-
-
-
-
         }
         else
         {
-            Log.d("Login","not logged in");
-            Intent intent=new Intent(getApplication(),LoginActivity.class);
-            startActivity(intent);
+            mInit=false;
+            changeMenuToLogout();
+            deleteUsername();
         }
     }
 
@@ -164,6 +161,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                         break;
                     case R.id.logout_navigation_menu_item:
                        String title=item.getTitle().toString();
+
                         if(title.equals("Logout"))
                         {
                         //    mFirebaseAuth.signOut();
@@ -216,13 +214,13 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
 
     public void setUsername(String username)
     {
-        TextView textView=findViewById(R.id.textView_user);
         textView.setText("You are logged in as:"+username);
+        textView.setVisibility(View.VISIBLE);
     }
     public void deleteUsername()
     {
-        TextView textView=findViewById(R.id.textView_user);
-        textView.setText("You must log in");
+        textView.setVisibility(View.VISIBLE);
+        textView.setText("You are not logged in");
     }
 
 

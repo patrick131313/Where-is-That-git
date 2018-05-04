@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,14 +31,18 @@ import com.patrick.whereisthat.login.LoginActivity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText mEmail,mUsername,mPassword;
+    private EditText mEmail,mUsername,mPassword,mRPassword;
     private Button mCreateAccount;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
         mEmail=findViewById(R.id.register_email);
         mUsername=findViewById(R.id.register_username);
         mPassword=findViewById(R.id.register_password);
+        mRPassword=findViewById(R.id.register_repeat_password);
         mCreateAccount=findViewById(R.id.create_account_button);
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -65,13 +71,38 @@ public class RegisterActivity extends AppCompatActivity {
         mCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                boolean register=true;
                 final String email = mEmail.getText().toString();
                 final String user = mUsername.getText().toString();
                 final String password = mPassword.getText().toString();
+                final String rpassword=mRPassword.getText().toString();
                 Log.d("Email:", email.toString());
                 Log.d("Password:", password.toString());
+               // if (!isEmailValid(email) || email.equals("") || user.equals("")||(password.equals("")||mPassword.equals("")||(!rpassword.equals(password))))
+               //     register=false;
+                if(email.equals("") || user.equals("")||(password.equals("")||rpassword.equals("")))
+                 {
+                     Toast.makeText(getApplicationContext(), "Some fields are not completed", Toast.LENGTH_LONG).show();
+                     register = false;
+                }
+                else
+                {
+                    if (!isEmailValid(email))
+                    {
+                        Toast.makeText(getApplicationContext(), "Email adress is not valid", Toast.LENGTH_LONG).show();
+                        register = false;
+                    }
+                    else
+                    {
+                        if((!rpassword.equals(password)))
+                        {
+                            Toast.makeText(getApplicationContext(), "Passwords don't match", Toast.LENGTH_LONG).show();
 
-
+                            register = false;
+                        }
+                    }
+                }
+                if(register==true)
                 checkIfUserExists(email,user,password);
 
 
@@ -105,7 +136,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                         }
                         else {
-                            Log.d("Query", "You cand add this user");
+                            Log.d("Query", "You can add this user");
                             //toastSuccesful();
                             mFirebaseAuth.createUserWithEmailAndPassword(email, password).
                                     addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
@@ -130,15 +161,18 @@ public class RegisterActivity extends AppCompatActivity {
                                                 startActivity(intent);*/
 
 
-                                            } else
-                                                Toast.makeText(getApplication(), "Error", Toast.LENGTH_LONG).show();
-
+                                            } else {
+                                              //  Toast.makeText(getApplication(), "Error", Toast.LENGTH_LONG).show();
+                                            }
                                         }
                                     }
                           ).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.d("Query", e.toString());                                }
+                                    Log.d("QueryFailure", e.toString());
+                                    if(e.toString().equals("com.google.firebase.auth.FirebaseAuthUserCollisionException: The email address is already in use by another account."))
+                                        Toast.makeText(getApplication(), "This email address is already in use by another account ", Toast.LENGTH_LONG).show();
+                                }
                             });
 
 
@@ -179,6 +213,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onStop();
         mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
 
+    }
+    private boolean isEmailValid(String email){
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(email);
+        return matcher.find();
     }
 }
 

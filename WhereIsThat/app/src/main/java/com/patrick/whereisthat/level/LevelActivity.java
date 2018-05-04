@@ -80,6 +80,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     private boolean hint_pressed=false;
     private float mDistance;
     private SharedPreferences sharedPreferences;
+    private boolean isFinished=false;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -162,9 +163,16 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mBinding.buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!isFinished)
+                {
                 StopTimer();
                 new ScoreTask().execute();
                 new ImageTask().execute();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -252,7 +260,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void onMapClick(LatLng latLng) {
 
         mMap.clear();
-
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latLng.latitude, latLng.longitude)));
               //  .title("Problem"));
@@ -462,10 +469,17 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public class ImageTask extends AsyncTask<Void, Void,Integer> {
         @Override
         protected Integer doInBackground(Void... voids) {
-            if(mCurrent!=10)
-            return getResources().getIdentifier(levelList.get(mCurrent).getPhoto(), "drawable", getPackageName());
+            if(mCurrent!=10) {
+                Log.i("mCurrent", String.valueOf(mCurrent));
+                return getResources().getIdentifier(levelList.get(mCurrent).getPhoto(), "drawable", getPackageName());
+
+            }
             else
+            {
+                Log.i("mCurrent", "Return -1");
+
                 return -1;
+            }
         }
 
         @Override
@@ -476,7 +490,8 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 mBinding.imageViewDb.setVisibility(View.INVISIBLE);
                 mBinding.imageViewClose.setVisibility(View.INVISIBLE);
                 Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
-                mCurrent=0;
+                mCurrent=10;
+                isFinished=true;
                 UpdateScore();
             }
             else {
