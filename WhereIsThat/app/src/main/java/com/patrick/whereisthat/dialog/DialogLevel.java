@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.level.LevelActivity;
@@ -48,8 +49,18 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 Log.i("DialogOnDismiss", "onDismiss: ");
-                //    mConfirm.callOnClick();
-                dismiss();
+                if(getArguments().getInt("Round")==10)
+                {
+                    dismiss();
+                    ((LevelActivity)getActivity()).makeToast();
+                    ((LevelActivity)getActivity()).finish();
+
+
+                }
+                else {
+                    //    mConfirm.callOnClick();
+                    dismiss();
+                }
                 //       ((SprintActivity)getActivity()).StartTimer();
                 //      ((SprintActivity)getActivity()).mCountDownTimer.start();
 

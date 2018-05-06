@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/close_city_sprint"
         android:textColor="@color/colorWhite"
-        android:text="ZZZZZZ"/>
+       />
     <TextView
         android:id="@+id/text_view_sprint_hs"
         android:layout_width="wrap_content"
@@ -65,7 +65,8 @@
         android:layout_toRightOf="@+id/tw_round"
         android:textColor="@color/colorWhite"
         android:layout_marginLeft="8dp"
-        tools:text="aaaaaa"/>
+       />
+
 
 
     <!-- This FrameLayout insets its children based on system windows using

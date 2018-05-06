@@ -3,6 +3,7 @@ package com.patrick.whereisthat.sprint;
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.location.Address;
@@ -36,9 +37,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.R;
+import com.patrick.whereisthat.StartActivity;
 import com.patrick.whereisthat.databinding.ActivityLevelBinding;
 import com.patrick.whereisthat.databinding.ActivitySprintBinding;
 import com.patrick.whereisthat.dialog.Dialog;
+import com.patrick.whereisthat.dialog.DialogRestart;
 import com.patrick.whereisthat.sprintDB.Cities;
 import com.patrick.whereisthat.sprintDB.Sprint;
 import com.patrick.whereisthat.sprintDB.SprintDao;
@@ -68,7 +71,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private GoogleMap mMap;
     private int nr_cities=0;
     private int counter=0;
-    private AsyncTask mTask;
+    public AsyncTask mTask;
     private List<Cities> mCities=new ArrayList<Cities>();
     List<LatLng> latLngs = new ArrayList<LatLng>();
     boolean isFirst=true;
@@ -85,6 +88,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private float mDistance;
     private long mScoreRound=0;
     private boolean isFinished=false;
+    private Dialog mDialog;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -175,7 +179,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             public void onClick(View view) {
                 if(mTask.getStatus()==AsyncTask.Status.RUNNING) {
                     mTask.cancel(false);
-                    //   mTask.cancel(true);
                     if(mTask.isCancelled())
                     {
                         Log.i("zz", "doInBackground:cancelled ");
@@ -196,6 +199,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 }
             }
         });
+
+
         // Set up the user interaction to manually show or hide the system UI.
 
         // Upon interacting with UI controls, delay any scheduled hide()
@@ -226,6 +231,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     CheckScore();
                     mBinding.textViewCountdown.setText("0:00:00");
                     isFinished=true;
+                    if(mDialog!=null)
+                    mDialog.dismiss();
+                    DialogRestart rDialog=new DialogRestart();
+                    rDialog.show(getSupportFragmentManager(),"aaa");
 
 
             }
@@ -248,7 +257,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //    Log.i("CheckScore", "onDataChange: "+dataSnapshot.getValue().toString());
+                    Log.i("CheckScore", "onDataChange: "+dataSnapshot.getValue().toString());
                 String  current_score=dataSnapshot.getValue().toString();
                 if(Long.parseLong(current_score)<mScore)
                 {
@@ -274,11 +283,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mCountDownTimer.onFinish();*/
         if(mTask.getStatus()==AsyncTask.Status.RUNNING) {
             mTask.cancel(false);
-            //   mTask.cancel(true);
-      /*      if(mTask.isCancelled())
-           {
-               Log.i("OnDestroy", "onDestroy:cancelled ");
-           }*/
         }
     }
 
@@ -544,6 +548,12 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
         @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mTask.cancel(true);
+        }
+
+        @Override
         protected List<LatLng> doInBackground(Void... voids) {
 
 
@@ -569,8 +579,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 double longitude = ll.nextDouble() + lng;
                 LatLng latLng1 = new LatLng(latitude, longitude);
                 try {
+
                     adresses = geocoder.getFromLocation(latLng1.latitude, latLng1.longitude, 1);
                     if (!adresses.isEmpty()) {
+
                         if (adresses.get(0).getLocality() != null && !adresses.get(0).getLocality().contains(" ") && !ContainsCyrillic(adresses.get(0).getLocality()) ) {
                             Cities cities = new Cities(adresses.get(0).getLocality(), String.valueOf(latLng1.latitude), String.valueOf(latLng1.longitude));
                             mCities.add(cities);
@@ -686,7 +698,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             bundle.putLong("Score",mScoreRound);
             bundle.putLong("Total",mScore);
 
-            Dialog mDialog=new Dialog();
+             mDialog=new Dialog();
             mDialog.setArguments(bundle);
            // mCountDownTimer.cancel();
            // mCountDownTimer.onFinish();
