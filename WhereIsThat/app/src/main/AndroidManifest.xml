@@ -43,7 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".selectlevel.SelectLevelActivity" />
+        <activity android:name=".selectlevel.SelectLevelActivity"
+            android:label="Select Level"/>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />

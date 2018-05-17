@@ -628,6 +628,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             //mDialog.setArguments(bundle);
             // mCountDownTimer.cancel();
             // mCountDownTimer.onFinish();
+            mDialog.setCancelable(false);
             mDialog.show(getSupportFragmentManager(),"aaa");
            // StartTimer();
         }

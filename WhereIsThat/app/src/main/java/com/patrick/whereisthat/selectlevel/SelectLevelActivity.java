@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -45,8 +46,8 @@ public class SelectLevelActivity extends AppCompatActivity {
     private int mLastPlayed;
     private long prevLevel;
 
-    private String []mArrayLevels={"Level1:11","Level2:22","Level3:33","Level4:44","Level5:55","Level6:66",
-            "Level7:77","Level8:88","Level9:99","Level10:100","Level11:111"};
+    private String []mArrayLevels={"Level 1","Level 2","Level 3","Level 4","Level 5","Level 6",
+            "Level 7","Level 8","Level 9","Level 10","Level 11"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,8 @@ public class SelectLevelActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+        DividerItemDecoration dividerItemDecoration=new DividerItemDecoration(this,layoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         mAdapter=new RecyclerViewAdapter(this,mArrayLevels,mHighscores);
         mRecyclerView.setAdapter(mAdapter);
@@ -118,13 +121,18 @@ public class SelectLevelActivity extends AppCompatActivity {
        
             //Object score=mHighscores.get("level"+String.valueOf(position+1));
             int level=position+1;
+                Log.i("Imagechanged",  String.valueOf(position));
+                holder.mImageView.setImageResource(getResources().getIdentifier("ic_"+String.valueOf(level), "drawable", getPackageName()));
+
             holder.mLevel.setText(mArrayLevels[position]);
             if(mHigscores.isEmpty())
             {
+
                 holder.mHighscore.setText("Higscore:0");
             }
             else
             {
+
                 final Object score=mHighscores.get("level"+String.valueOf(position+1));
                 holder.mHighscore.setText("Higscore:"+score.toString());
                 if(position!=0)
@@ -135,11 +143,13 @@ public class SelectLevelActivity extends AppCompatActivity {
                 if ((position == 0) || (position != 0 && prevLevel != 0)) {
                     mLastPlayed = position + 1;
                 }
+
+
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
-                        Object prev = mHighscores.get("level" + String.valueOf(position));
+                       // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
+                       Object prev = mHighscores.get("level" + String.valueOf(position));
                         if(position+1<=mLastPlayed)
                         {
                             Intent intent = new Intent(getApplicationContext(), LevelActivity.class);
@@ -175,10 +185,10 @@ public class SelectLevelActivity extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            ImageView mImageView;
-            TextView mLevel;
-            TextView mHighscore;
-            RelativeLayout mLevelItem;
+          public ImageView mImageView;
+          public TextView mLevel;
+          public TextView mHighscore;
+          public RelativeLayout mLevelItem;
 
             public ViewHolder(View itemView) {
                 super(itemView);

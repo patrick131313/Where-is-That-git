@@ -99,7 +99,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
            if (mArrayFiltered.size() != 0) {
                 holder.mUser.setText(mArrayFiltered.get(position-1).getUser().toString());
                 holder.mScore.setText(mArrayFiltered.get(position-1).getScore().toString());
-                holder.mPosition.setText(String.valueOf(mArrayFiltered.get(position-1).getPosition()) + " ");
+                holder.mPosition.setText(String.valueOf(mArrayFiltered.get(position-1).getPosition()) );
           }
         }
         else

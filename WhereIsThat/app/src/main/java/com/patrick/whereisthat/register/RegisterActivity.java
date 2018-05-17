@@ -144,6 +144,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<AuthResult> task) {
                                             if (task.isSuccessful()) {
                                                 //
+
                                                 String userID = mFirebaseAuth.getCurrentUser().getUid();
 
                                                 DatabaseReference userDb = FirebaseDatabase.getInstance().getReference().child("users").child(userID);

@@ -7,14 +7,17 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -56,7 +59,10 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-         mFirebaseAuth = FirebaseAuth.getInstance();
+
+
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -68,8 +74,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 if(!mUser.equals("")) {
-                    Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
-                    startActivity(intent);
+                        Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
+                        startActivity(intent);
                 }
                 else
                 {
@@ -100,6 +106,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -137,12 +144,14 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     {
 
         NavigationView mNavigationView=findViewById(R.id.nav_view);
+
         if(mNavigationView!=null)
             setUpNavListener(mNavigationView);
     }
 
     public void setUpNavListener(NavigationView navigationView)
     {
+
         navigationView.setNavigationItemSelectedListener(
         new NavigationView.OnNavigationItemSelectedListener() {
             @Override

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,10 +27,13 @@ public class ScoresRVFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.scores_rv,container,false);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(getContext());
         mRecyclerView=view.findViewById(R.id.rw_scores);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
         mRecyclerView.setHasFixedSize(true);
+
+
      return view;
     }
 

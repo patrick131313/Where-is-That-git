@@ -34,7 +34,8 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme);
+        //setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme);
+
     }
 
 
@@ -66,11 +67,11 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
 
             }
         });
-        if (dialog != null) {
+   /*    if (dialog != null) {
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height = ViewGroup.LayoutParams.MATCH_PARENT;
             dialog.getWindow().setLayout(width, height);
-        }
+        }*/
     }
     @Nullable
     @Override

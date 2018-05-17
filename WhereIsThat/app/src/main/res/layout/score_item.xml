@@ -2,30 +2,43 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
+    android:layout_height="wrap_content"
+    android:background="@color/grey">
 
     <TextView
         android:id="@+id/text_view_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Tezd"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
         android:textSize="18sp"
+        android:textColor="@color/colorBlack"
         android:layout_toRightOf="@+id/text_view_position"/>
     <TextView
         android:id="@+id/text_view_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
         android:textSize="18sp"
+        android:textColor="@color/colorBlack"
         tools:text="1."/>
 
     <TextView
         android:id="@+id/text_view_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="16dp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
         tools:text="Tezd2"
         android:textSize="18sp"
         android:layout_alignParentEnd="true"/>

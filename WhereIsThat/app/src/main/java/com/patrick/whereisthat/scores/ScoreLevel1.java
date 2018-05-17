@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.solver.widgets.Snapshot;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -60,6 +61,8 @@ public class ScoreLevel1 extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
         mRecyclerView.setHasFixedSize(true);
+        DividerItemDecoration dividerItemDecoration=new DividerItemDecoration(getContext(),mLayoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
 
        // Log.i("Score", "onCreateView: "+mUser);
         return ScoreLevel1;
@@ -70,6 +73,7 @@ public class ScoreLevel1 extends Fragment {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
    //     mRecylerViewAdapter=new RecyclerViewAdapter();
+
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
         mRecylerViewAdapter.TransferAdapter(mRecylerViewAdapter);
 

@@ -3,19 +3,23 @@
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/grey">
 
     <TextView
         android:id="@+id/text_view_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pozitia:"
+        android:textColor="@color/colorBlack"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/text_view_username"
+
         />
     <SearchView
         android:id="@+id/search_view_user"
         android:padding="8dp"
+        android:textColor="@color/colorBlack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/text_view_position">
@@ -24,6 +28,7 @@
         android:id="@+id/text_view_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/colorBlack"
         android:text="User:"
         android:layout_margin="8dp"
         android:textSize="18sp"
@@ -34,6 +39,7 @@
         android:id="@+id/text_view_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/colorBlack"
         android:text="Scor:"
         android:textSize="18sp"
         app:layout_constraintRight_toRightOf="parent"
