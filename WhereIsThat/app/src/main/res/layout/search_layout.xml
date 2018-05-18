@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/grey">
 
     <SearchView
+        android:paddingTop="8dp"
         android:id="@+id/search_view_user"
         android:padding="8dp"
         android:layout_width="match_parent"
@@ -12,4 +14,42 @@
         android:textColor="@color/colorBlack"
        >
     </SearchView>
-</RelativeLayout>
+    <TextView
+        android:id="@+id/text_view_position_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@+id/search_view_user"
+        app:layout_constraintTop_toBottomOf="@+id/search_view_user"
+        android:layout_marginLeft="16dp"
+        android:text="#"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        />
+    <TextView
+        android:id="@+id/text_view_user_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/text_view_position_header"
+        app:layout_constraintTop_toBottomOf="@+id/search_view_user"
+        android:layout_marginLeft="16dp"
+        android:text="Name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        />
+    <TextView
+        android:id="@+id/text_view_points_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="@+id/search_view_user"
+        app:layout_constraintTop_toBottomOf="@+id/search_view_user"
+        android:layout_marginRight="16dp"
+        android:text="Points"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        />
+
+
+</android.support.constraint.ConstraintLayout>

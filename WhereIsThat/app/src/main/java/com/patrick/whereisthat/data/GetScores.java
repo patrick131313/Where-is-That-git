@@ -114,6 +114,11 @@ public class GetScores {
 
 
                     scoreList.add(score);
+                    scoreList.add(score);
+                    scoreList.add(score);
+                    scoreList.add(score);
+                    scoreList.add(score);
+
 
                     Log.i("Snapshot",snapshot.child("scores/"+level).getValue().toString());
                     Log.i("Snapshot",snapshot.child("user").getValue().toString());

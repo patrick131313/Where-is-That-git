@@ -36,7 +36,7 @@
 
         <activity
             android:name=".StartActivity"
-            android:label="@string/title_activity_start">
+            android:label="Where is this?">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,19 +47,25 @@
             android:label="Select Level"/>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login" />
+            android:label="Login" />
         <activity
             android:name=".login.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".login.LoginActivity" />
-        <activity android:name=".register.RegisterActivity" />
+        <activity android:name=".login.LoginActivity"
+            android:screenOrientation="portrait"
+            android:label="Login"
+            />
+        <activity android:name=".register.RegisterActivity"
+            android:label="Register"
+            />
         <activity
             android:name=".level.LevelActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_level"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-        <activity android:name=".scores.ScoresActivity" />
+        <activity android:name=".scores.ScoresActivity"
+            android:label="Highscores"/>
         <activity
             android:name=".sprint.SprintActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

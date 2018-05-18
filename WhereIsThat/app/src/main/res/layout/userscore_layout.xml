@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pozitia:"
+        android:paddingLeft="8dp"
         android:textColor="@color/colorBlack"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/text_view_username"
@@ -19,17 +20,20 @@
     <SearchView
         android:id="@+id/search_view_user"
         android:padding="8dp"
+        android:queryHint="Search User"
         android:textColor="@color/colorBlack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/text_view_position">
     </SearchView>
     <TextView
+        android:paddingTop="8dp"
         android:id="@+id/text_view_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:text="User:"
+        android:paddingBottom="8dp"
         android:layout_margin="8dp"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -41,9 +45,47 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorBlack"
         android:text="Scor:"
+        android:layout_marginRight="8dp"
         android:textSize="18sp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_username"/>
+
+    <TextView
+        android:id="@+id/text_view_position_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@+id/search_view_user"
+        app:layout_constraintTop_toBottomOf="@+id/search_view_user"
+        android:layout_marginLeft="16dp"
+        android:text="#"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        />
+    <TextView
+        android:id="@+id/text_view_user_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/text_view_position_header"
+        app:layout_constraintTop_toBottomOf="@+id/search_view_user"
+        android:layout_marginLeft="16dp"
+        android:text="Name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        />
+    <TextView
+        android:id="@+id/text_view_points_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="@+id/text_view_score"
+        app:layout_constraintTop_toBottomOf="@+id/search_view_user"
+        android:layout_marginRight="8dp"
+        android:text="Points"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        />
 
 
          <!--   app:layout_constraintLeft_toLeftOf="@+id/text_view_username"

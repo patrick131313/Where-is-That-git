@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,6 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mEmail=findViewById(R.id.register_email);
         mUsername=findViewById(R.id.register_username);
         mPassword=findViewById(R.id.register_password);
@@ -82,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
                //     register=false;
                 if(email.equals("") || user.equals("")||(password.equals("")||rpassword.equals("")))
                  {
-                     Toast.makeText(getApplicationContext(), "Some fields are not completed", Toast.LENGTH_LONG).show();
+                     Toast.makeText(getApplicationContext(), "You must complete all fields", Toast.LENGTH_LONG).show();
                      register = false;
                 }
                 else
@@ -218,6 +220,15 @@ public class RegisterActivity extends AppCompatActivity {
     private boolean isEmailValid(String email){
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(email);
         return matcher.find();
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
 

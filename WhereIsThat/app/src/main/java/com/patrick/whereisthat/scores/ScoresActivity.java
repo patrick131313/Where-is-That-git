@@ -5,6 +5,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.patrick.whereisthat.R;
@@ -19,6 +20,7 @@ public class ScoresActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scores);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mSectionsPageAdapter=new SectionsPageAdapter(getSupportFragmentManager());
         user=getIntent().getStringExtra(StartActivity.EXTRA_USERNAME);
         //Toast.makeText(getApplicationContext(),user,Toast.LENGTH_LONG).show();
@@ -102,5 +104,15 @@ public class ScoresActivity extends AppCompatActivity {
         adapter.addFragment(new Overall(),"Overall");
         adapter.addFragment(new ScoreSprint(),"Sprint Mode");*/
         viewPager.setAdapter(adapter);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

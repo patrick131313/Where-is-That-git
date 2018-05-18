@@ -3,6 +3,7 @@ package com.patrick.whereisthat.scores;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,7 +80,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 @Override
                 public boolean onQueryTextChange(String s) {
-                  mAdapter.getFilter().filter(s);
+                    if(s.equals(""))
+                        mAdapter.getFilter().filter(s);
                     return false;
                 }
             });
@@ -104,10 +106,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         else
         {
+
             if(!Username.equals("") &&mArray.size()>0) {
-                holder.mUser.setText(mArray.get(mArray.size() - 1).getUser().toString());
-                holder.mScore.setText("Score:" + mArray.get(mArray.size() - 1).getScore().toString());
-                holder.mPosition.setText("Rank:" + String.valueOf(mArray.get(mArray.size() - 1).getPosition()));
+
+
+                holder.mUser.setText(Html.fromHtml("Logged user:"+"<b>"+mArray.get(mArray.size() - 1).getUser().toString()+"</b>"));
+                holder.mScore.setText(Html.fromHtml("Points:" + "<b>"+mArray.get(mArray.size() - 1).getScore().toString()+"</b>"));
+                holder.mPosition.setText(Html.fromHtml("Rank:" +"<b>"+ String.valueOf(mArray.get(mArray.size() - 1).getPosition())+"</b>"));
           /*      holder.mUser.setText(userLogged.getUser().toString());
                 holder.mScore.setText("Score:" + userLogged.getScore().toString());
                 holder.mPosition.setText("Rank:" +userLogged.getPosition());*/
@@ -122,16 +127,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.mArray=ranks;
         Log.i("ArraySize", String.valueOf(mArray.size()));
 
-       /* if(!Username.equals(""))
-        {
-            userLogged=new ScoresRank(mArray.get(mArray.size()-1).getUser(),mArray.get(mArray.size()-1).getScore(),mArray.get(mArray.size()-1).getPosition());
-            mArray.remove(mArray.size()-1);
-
-            mArrayFiltered.remove((mArrayFiltered.size())-1);
-
-
-        }
-        Log.i("ArraySize", String.valueOf(mArray.size()));*/
         this.notifyDataSetChanged();
 
     }
