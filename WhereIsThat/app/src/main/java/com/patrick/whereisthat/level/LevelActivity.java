@@ -21,7 +21,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -35,6 +39,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.databinding.ActivityLevelBinding;
+import com.patrick.whereisthat.dialog.DialogImage;
 import com.patrick.whereisthat.dialog.DialogLevel;
 import com.patrick.whereisthat.levelsDB.Level;
 import com.patrick.whereisthat.levelsDB.LevelDao;
@@ -169,7 +174,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 {
                 StopTimer();
                 new ScoreTask().execute();
-                new ImageTask().execute();
+                //new ImageTask().execute();
                 }
                 else
                 {
@@ -185,6 +190,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             public void onClick(View view) {
                 mBinding.imageViewClose.setVisibility(View.INVISIBLE);
                 mBinding.imageViewDb.setVisibility(View.INVISIBLE);
+                mBinding.textViewWhere.setVisibility(View.INVISIBLE);
 
             }
         });
@@ -192,21 +198,36 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mBinding.buttonHint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mBinding.textViewHint.setVisibility(View.VISIBLE);
-                mBinding.imageViewHint.setVisibility(View.VISIBLE);
+             //   mBinding.textViewHint.setVisibility(View.VISIBLE);
+            //    mBinding.imageViewHint.setVisibility(View.VISIBLE);
+                showDialog();
                 hint_pressed=true;
+
+
+
             }
         });
-        mBinding.imageViewHint.setOnClickListener(new View.OnClickListener() {
+
+        mBinding.imageViewDb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mBinding.textViewHint.setVisibility(View.INVISIBLE);
-                mBinding.imageViewHint.setVisibility(View.INVISIBLE);
             }
         });
 
 
 
+    }
+
+    public void showDialog()
+    {
+       MaterialDialog dialogHint=new MaterialDialog.Builder(this)
+                .title("Hint")
+                .content(mBinding.textViewHint.getText().toString())
+                .backgroundColorRes(R.color.grey)
+                .positiveText("Got it")
+                .positiveColor(getResources().getColor(R.color.colorPrimary))
+                .show();
+        dialogHint.setCancelable(false);
     }
 
     public void onMapReady(GoogleMap googleMap) {
@@ -264,13 +285,17 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void onMapClick(LatLng latLng) {
 
         mMap.clear();
-        if (!isFinished) {
+        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) {
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude)));
             //  .title("Problem"));
             mLatLng = latLng;
             if (mBinding.buttonConfirm.getVisibility() == View.INVISIBLE)
                 mBinding.buttonConfirm.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            Toast.makeText(this,"You must close the image to put marker on map",Toast.LENGTH_LONG).show();
         }
     }
     public void getCity()
@@ -356,14 +381,22 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         @Override
         public void run() {
             timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-            updateTime = timeSwapBuff+timeInMilliseconds;
-            int secs = (int)(updateTime/1000);
-            int mins = secs/60;
-            secs%=60;
-            int miliseconds = (int)(updateTime%1000);
-            miliseconds=miliseconds/10;
-            mTime.setText(""+mins+":"+String.format("%02d",secs)+":"
-                    +String.format("%02d",miliseconds));
+            updateTime = timeSwapBuff + timeInMilliseconds;
+            int secs = (int) (updateTime / 1000);
+            int mins = secs / 60;
+            secs %= 60;
+            int miliseconds = (int) (updateTime % 1000);
+            miliseconds = miliseconds / 10;
+            if (mins != 0) {
+                mTime.setText("Time: " + mins + ":" + String.format("%02d", secs) + ":"
+                        + String.format("%02d", miliseconds));
+            }
+            else
+            {
+                mTime.setText("Time: "+ String.format("%02d", secs) + ":"
+                        + String.format("%02d", miliseconds));
+            }
+
             customHandler.postDelayed(this,0);
         }
     };
@@ -509,24 +542,27 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 UpdateScore();
             //    mDialog.dismiss();
             //    finish();*/
+                mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
                 UpdateScore();
             }
             else {
           //      mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
                 mMap.clear();
+                mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
                 hint_pressed=false;
+                mBinding.textViewRound.setText("Round:"+(mCurrent+1)+"/10");
                 mBinding.imageViewDb.setVisibility(View.VISIBLE);
-                mBinding.imageViewClose.setVisibility(View.VISIBLE);
-                if(mBinding.textViewHint.getVisibility()==View.VISIBLE) {
-                    mBinding.textViewHint.setVisibility(View.INVISIBLE);
-                    mBinding.imageViewHint.setVisibility(View.INVISIBLE);
-                }
                 mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
                 mBinding.textViewHint.setText(levelList.get(mCurrent).getHint());
-                Glide.with(getApplicationContext())
+
+                Log.i("Resource", String.valueOf(integer));
+            Glide.with(getApplicationContext())
                         .load(integer)
+                        .apply(new RequestOptions().override(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT))
                         .into(mBinding.imageViewDb);
 
+                mBinding.textViewWhere.setVisibility(View.VISIBLE);
+                mBinding.imageViewClose.setVisibility(View.VISIBLE);
                 mCurrent++;
 
                 Log.i(TAG, "onPostExecute: " + String.valueOf(mCurrent));
@@ -561,9 +597,11 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                     break;
                 case "3":
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_silver));
+
                     break;
                 case "4":
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_standard));
+
                     break;
 
                 default:break;
@@ -596,6 +634,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 mBinding.textViewScore.setVisibility(View.VISIBLE);
                 mBinding.textViewTimer.setVisibility(View.VISIBLE);
                 mBinding.buttonHint.setVisibility(View.VISIBLE);
+
                 //      mBinding.buttonConfirm.setVisibility(View.VISIBLE);
                 StartTimer();
             }
@@ -615,7 +654,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mBinding.textViewScore.setText(String.valueOf(mScore));
+
             mDialog=new DialogLevel();
             Bundle bundle=new Bundle();
             bundle.putBoolean("Finished",isFinished);
@@ -630,6 +669,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             // mCountDownTimer.onFinish();
             mDialog.setCancelable(false);
             mDialog.show(getSupportFragmentManager(),"aaa");
+
            // StartTimer();
         }
     }
@@ -640,7 +680,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             Toast.makeText(getApplicationContext(), "You've beat your level "+mLevel+ " record, now your highscore is "+mScore+" points!", Toast.LENGTH_SHORT).show();
             else
 
-        Toast.makeText(getApplicationContext(), "Yo've finished level "+mLevel+ " with "+mScore+" points!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "You've finished level "+mLevel+ " with "+mScore+" points!", Toast.LENGTH_SHORT).show();
     }
 }
 

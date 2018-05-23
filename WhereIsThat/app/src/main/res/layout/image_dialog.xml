@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="15dp"
+    android:background="@color/grey">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Where is?"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        android:id="@+id/dialogTitle"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:id="@+id/dialogImage"/>
+
+</RelativeLayout>

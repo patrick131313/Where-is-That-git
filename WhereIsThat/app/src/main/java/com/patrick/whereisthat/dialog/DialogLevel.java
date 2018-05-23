@@ -28,13 +28,13 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
     TextView mTime;
     long updateTime;
     int secs,mins,miliseconds;
-    Button mConfirm;
+    Button mConfirm,mQuit;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //setStyle(DialogFragment.STYLE_NORMAL, R.style.AppTheme);
+       setStyle(DialogFragment.STYLE_NO_FRAME, R.style.AppTheme);
 
     }
 
@@ -43,7 +43,7 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
     @Override
     public void onStart() {
         super.onStart();
-
+        ((LevelActivity)getActivity()).new ImageTask().execute();;
         android.app.Dialog dialog=getDialog();
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -67,10 +67,11 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
 
             }
         });
-   /*    if (dialog != null) {
+       /*if (dialog != null) {
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = ViewGroup.LayoutParams.MATCH_PARENT;
+            int height=2000;
             dialog.getWindow().setLayout(width, height);
+
         }*/
     }
     @Nullable
@@ -79,7 +80,7 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
 
         View view=inflater.inflate(R.layout.dialog_level,container,false);
        mConfirm=view.findViewById(R.id.dialogContinue);
-
+       mQuit=view.findViewById(R.id.dialogQuit);
         mRound=view.findViewById(R.id.dialogRound);
         mTime=view.findViewById(R.id.dialogTime);
         mScore=view.findViewById(R.id.dialogScore);
@@ -102,9 +103,9 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
                     + String.format("%02d", miliseconds));
         }
 
-        mScore.setText("Score:"+String.valueOf(getArguments().getLong("RoundScore")));
+        mScore.setText("Score: "+String.valueOf(getArguments().getLong("RoundScore")));
         mRound.setText("Round "+String.valueOf(getArguments().getInt("Round"))+"/10");
-        mTotal.setText("Score:"+String.valueOf(getArguments().getLong("Score")));
+        mTotal.setText("Total Score: "+String.valueOf(getArguments().getLong("Score")));
         mDistance.setText("Distance: "+String.valueOf(getArguments().getFloat("Distance"))+"km");
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +113,13 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
                 dismiss();
                 ((LevelActivity)getActivity()).StartTimer();
 
+            }
+        });
+        mQuit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+                ((LevelActivity)getActivity()).onBackPressed();
             }
         });
      

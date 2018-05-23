@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_marginRight="15dp"
-    android:layout_marginLeft="15dp"
-    android:padding="15dp">
+    android:padding="15dp"
+    android:background="@color/grey"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Round"
+        android:textStyle="bold"
         android:textSize="21sp"
         android:textColor="@color/colorBlack"
         android:id="@+id/dialogRound"/>
@@ -22,61 +25,76 @@
         android:text="Time:"
         android:id="@+id/dialogTime"
         android:textSize="20sp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/dialogRound"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Distance:"
         android:id="@+id/dialogDistance"
         android:textSize="20sp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/dialogTime"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Score:"
         android:id="@+id/dialogScore"
         android:textSize="20sp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/dialogDistance"
+        />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Total score:"
         android:id="@+id/dialogTotal"
         android:textSize="20sp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/dialogScore"/>
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:src="@drawable/ic_distance"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:id="@+id/dialogImage"
+        android:layout_below="@id/dialogTotal"
+        android:layout_above="@+id/buttons"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        />
+
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/buttons"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
 
         <Button
+            android:id="@+id/dialogQuit"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="@color/colorBlack"
-            android:text="Quit"
-            android:layout_marginTop="30dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:id="@+id/dialogQuit"/>
+            android:layout_marginTop="30dp"
+            android:text="Quit"
+            android:textSize="15sp" />
 
         <Button
+            android:id="@+id/dialogContinue"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="@color/colorBlack"
-            android:text="Continue"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="30dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:id="@+id/dialogContinue"/>
+            android:layout_marginTop="30dp"
+            android:text="Continue"
+            android:textSize="15sp" />
 
     </RelativeLayout>
 
-</LinearLayout>
+</RelativeLayout>
