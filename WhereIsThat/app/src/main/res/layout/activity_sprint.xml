@@ -2,16 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/colorBlack"
     xmlns:map="http://schemas.android.com/apk/res-auto"
+
     tools:context="com.patrick.whereisthat.sprint.SprintActivity">
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
+
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/map_sprint"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
@@ -23,11 +26,15 @@
         tools:context="com.example.patrick.mapapp.MapsActivity" />
 
 
-    <Button
+    <ImageButton
         android:id="@+id/button_confirm_sprint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Confirm"
+        android:layout_width="64dp"
+        android:layout_margin="8dp"
+        android:layout_height="64dp"
+        android:background="#00000000"
+        android:layout_alignBottom="@+id/map_sprint"
+        android:layout_alignRight="@+id/map_sprint"
+        android:src="@drawable/ic_check_mark"
         android:visibility="invisible"/>
     <ImageView
         android:id="@+id/close_city_sprint"
@@ -41,31 +48,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/close_city_sprint"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/colorBlack"
        />
+
     <TextView
         android:id="@+id/text_view_sprint_hs"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/button_confirm_sprint"
-        android:textColor="@color/colorWhite"
-        android:text="Score:0"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:textColor="@color/colorBlack"
+        android:text="Score: 0"/>
+
     <TextView
         android:id="@+id/tw_round"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/text_view_sprint_hs"
+        android:layout_centerInParent="true"
+        android:layout_alignTop="@+id/text_view_sprint_hs"
+        android:layout_marginStart="16dp"
+        android:padding="8dp"
         android:layout_marginLeft="8dp"
-        android:text="1/20"
-        android:textColor="@color/colorWhite"/>
+        android:text="Round:1/20"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        android:textStyle="bold" />
     <TextView
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:id="@+id/text_view_countdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/tw_round"
-        android:textColor="@color/colorWhite"
+        android:layout_alignLeft="@+id/map_sprint"
+        android:textColor="@color/colorBlack"
         android:layout_marginLeft="8dp"
-       />
+        android:text="Time: 2:00:00"
+        />
 
 
 

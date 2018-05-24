@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -78,7 +81,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     ActivitySprintBinding mBinding;
     boolean isReady=false;
     private long mTimeRemaining;
-    private long mTime=120000;
+    private long mTime=60000;
     public CountDownTimer mCountDownTimer;
     private String mCurrent="DB";
     private long mScore=0;
@@ -89,6 +92,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private long mScoreRound=0;
     private boolean isFinished=false;
     private Dialog mDialog;
+    private MaterialDialog dialogCity;
+    private boolean clickedOne=false;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -164,6 +169,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mContentView = findViewById(R.id.map_sprint);
         new SprintTask().execute();
         new MapTask().execute();
+        new DialogFirst().execute();
+
         mBinding.textViewCountdown.setText("2:00:00");
         StartTimer();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -177,26 +184,26 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mBinding.buttonConfirmSprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mTask.getStatus()==AsyncTask.Status.RUNNING) {
+                if (mTask.getStatus() == AsyncTask.Status.RUNNING) {
                     mTask.cancel(false);
-                    if(mTask.isCancelled())
-                    {
+                    if (mTask.isCancelled()) {
                         Log.i("zz", "doInBackground:cancelled ");
                     }
                 }
 
-                if(counter==20 || isFinished)
-                {
-                    Toast.makeText(getApplicationContext(),"Sprint completed",Toast.LENGTH_LONG).show();
-                    mCountDownTimer.onFinish();
-                }
-                else {
-                    new ScoreTask().execute();
-                    new NextCityTask().execute();
-             //       mCountDownTimer.onFinish();
-               //    mTime=mTimeRemaining;
+                if (clickedOne == false) {
+                    if (counter == 20 || isFinished) {
+                        Toast.makeText(getApplicationContext(), "Sprint completed", Toast.LENGTH_LONG).show();
+                        mCountDownTimer.onFinish();
+                    } else {
+                        new ScoreTask().execute();
+                        new NextCityTask().execute();
+                        //       mCountDownTimer.onFinish();
+                        //    mTime=mTimeRemaining;
 
+                    }
                 }
+                clickedOne=true;
             }
         });
 
@@ -218,8 +225,15 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 secs%=60;
                 int miliseconds = (int)(millisUntilFinished%1000);
                 miliseconds=miliseconds/10;
-                mBinding.textViewCountdown.setText(""+mins+":"+String.format("%02d",secs)+":"
-                        +String.format("%02d",miliseconds));
+                if(mins==0) {
+                    mBinding.textViewCountdown.setText("Time: "+ String.format("%02d", secs) + ":"
+                            + String.format("%02d", miliseconds));
+                }
+                else
+                {     mBinding.textViewCountdown.setText("Time: " + mins + ":" + String.format("%02d", secs) + ":"
+                        + String.format("%02d", miliseconds));
+
+                }
                 mTimeRemaining=millisUntilFinished;
 
             }
@@ -227,20 +241,59 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
             public void onFinish() {
 
-                    Log.i("OnFinish", "Game finished");
-                    CheckScore();
-                    mBinding.textViewCountdown.setText("0:00:00");
-                    isFinished=true;
-                    if(mDialog!=null)
+                Log.i("OnFinish", "Game finished");
+                CheckScore();
+                mBinding.textViewCountdown.setText("Time: 00:00");
+                isFinished=true;
+                DialogRestart();
+              /*  if(mDialog!=null)
                     mDialog.dismiss();
-                    DialogRestart rDialog=new DialogRestart();
-                    rDialog.show(getSupportFragmentManager(),"aaa");
+                DialogRestart rDialog=new DialogRestart();
+                rDialog.show(getSupportFragmentManager(),"aaa");*/
 
 
             }
 
 
         };
+    }
+
+    public void DialogRestart()
+    {
+
+        if(dialogCity!=null)
+        {
+            dialogCity.dismiss();
+        }
+        MaterialDialog dialogRestart=new MaterialDialog.Builder(this)
+                .title("Restart")
+                .content("Do you want to restart?")
+                .backgroundColorRes(R.color.grey)
+                .positiveText("Yes")
+                .negativeText("No")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finish();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        mCountDownTimer.cancel();
+                        Log.i("OnDestroy", "onDestroy:called ");
+                        if(mTask.getStatus()== AsyncTask.Status.RUNNING) {
+                            mTask.cancel(false);
+                        }
+                        finish();
+                        Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .negativeColor(getResources().getColor(R.color.colorPrimary))
+                .positiveColor(getResources().getColor(R.color.colorPrimary))
+                .show();
+        dialogRestart.setCancelable(false);
     }
     @Override
     protected void onResume() {
@@ -257,11 +310,18 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.i("CheckScore", "onDataChange: "+dataSnapshot.getValue().toString());
+                Log.i("CheckScore", "onDataChange: "+dataSnapshot.getValue().toString());
                 String  current_score=dataSnapshot.getValue().toString();
                 if(Long.parseLong(current_score)<mScore)
                 {
                     myRef.setValue(mScore);
+                    Toast.makeText(getApplicationContext(), "You've beat your sprint mode record, now your highscore is "+mScore+" points!", Toast.LENGTH_SHORT).show();
+
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"You've finished sprint mode with "+ mScore+" points!",Toast.LENGTH_LONG).show();
+
                 }
             }
 
@@ -281,7 +341,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         Log.i("OnDestroy", "onDestroy:called ");
       /*  onDestroyCalled=true;
         mCountDownTimer.onFinish();*/
-        if(mTask.getStatus()==AsyncTask.Status.RUNNING) {
+        if(mTask.getStatus()==AsyncTask.Status.RUNNING && mTask!=null) {
             mTask.cancel(false);
         }
     }
@@ -337,7 +397,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
-
     }
     @Override
     public void onMapClick(LatLng latLng) {
@@ -348,8 +407,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.yellow_flag)));
-            if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE)
+            if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
+                clickedOne=false;
+            }
             mLatLng = latLng;
         }
         // if(mBinding.buttonConfirm.getVisibility()==View.INVISIBLE)
@@ -492,9 +553,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             for (int i = 0; i < sprintList.size(); i++) {
                 Log.i("aaaa", "onCreate: db: " + sprintList.get(i).getCity());
             }
-            mBinding.textViewSprint.setText(sprintList.get(0).getCity());
+          //  mBinding.textViewSprint.setText(sprintList.get(0).getCity());
             mBinding.closeCitySprint.setVisibility(View.VISIBLE);
             mCountDownTimer.start();
+
             //    Toast.makeText(getApplicationContext(),String.valueOf(sprints.size()),Toast.LENGTH_SHORT).show();
             //
         }
@@ -524,10 +586,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
                     break;
                 case "3":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_silver));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
                     break;
                 case "4":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_standard));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));
                     break;
 
                 default:break;
@@ -542,7 +604,20 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             mTask=new MarkerTask().execute();
         }
     }
+    public class DialogFirst extends AsyncTask<Void,Void,Void>
+    {
 
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            DialogCity(sprintList.get(0).getCity());
+        }
+    }
 
     public class MarkerTask extends AsyncTask<Void,Void,List<LatLng>> { //cautare orase random
 
@@ -623,14 +698,14 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 if(mCities.size()-2<counter)
                 {
 
-                  counter++;
+                    counter++;
                     mCurrent="DB";
-                    return sprintList.get(counter).getCity()+"Baza de date";
+                    return sprintList.get(counter).getCity();
                 }
                 else {
                     counter++;
                     mCurrent="Random";
-                    return mCities.get(counter).getCity()+"Random";
+                    return mCities.get(counter).getCity();
                     //   mText.setText(mCities.get(counter).getCity());
                 }
 
@@ -648,27 +723,28 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 //     Toast.makeText(getApplicationContext(),"Level completed"+mTimeRemaining/10,Toast.LENGTH_LONG).show();
                 mCountDownTimer.cancel();
                 mScore=mScore+mTimeRemaining/10;
-                mBinding.textViewSprintHs.setText(String.valueOf(mScore));
+                mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
                 mCountDownTimer.onFinish();
                 mMap.clear();
                 mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
                 mBinding.textViewSprint.setVisibility(View.INVISIBLE);
                 mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
-                mBinding.twRound.setText("20/20");
+                mBinding.twRound.setText("Round: 20/20");
 
 
             }
             else {
                 if (isFinished) {
-                    mBinding.textViewSprintHs.setText(String.valueOf(mScore));
+                    mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
                     mMap.clear();
                     mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
                     mBinding.textViewSprint.setVisibility(View.INVISIBLE);
                     mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
                 } else {
                     mMap.clear();
-                    mBinding.textViewSprint.setText(s);
-                    mBinding.twRound.setText(String.valueOf(counter + 1) + "/20");
+                //    mBinding.textViewSprint.setText(s);
+                    DialogCity(s);
+                    mBinding.twRound.setText("Round: "+String.valueOf(counter + 1) + "/20");
                     mBinding.textViewSprint.setVisibility(View.VISIBLE);
                     mBinding.closeCitySprint.setVisibility(View.VISIBLE);
                     mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
@@ -691,24 +767,21 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            // mBinding.te.setText(String.valueOf(mScore));
-            Bundle bundle=new Bundle();
-            bundle.putInt("Round",counter);
-            bundle.putFloat("Distance",mDistance);
-            bundle.putLong("Score",mScoreRound);
-            bundle.putLong("Total",mScore);
+            mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
 
-             mDialog=new Dialog();
-            mDialog.setArguments(bundle);
-           // mCountDownTimer.cancel();
-           // mCountDownTimer.onFinish();
-            mDialog.show(getSupportFragmentManager(),"aaa");
-            mBinding.textViewSprintHs.setText(String.valueOf(mScore));
-
-            /*StartTimer();
-            mCountDownTimer.start();*/
-            // StartTimer();
         }
+    }
+
+
+    public void DialogCity(String s)
+    {
+        dialogCity=new MaterialDialog.Builder(this)
+                .title("Where is "+ s+" ?")
+                .backgroundColorRes(R.color.grey)
+                .positiveText("Continue")
+                .positiveColor(getResources().getColor(R.color.colorPrimary))
+                .show();
+        dialogCity.setCancelable(false);
     }
 
 }

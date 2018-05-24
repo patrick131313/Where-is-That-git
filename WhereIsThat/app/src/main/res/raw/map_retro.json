@@ -33,10 +33,44 @@
   },
   {
     "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
     "elementType": "geometry.stroke",
     "stylers": [
       {
         "color": "#c9b2a6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.country",
+    "stylers": [
+      {
+        "visibility": "on"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.country",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "stylers": [
+      {
+        "visibility": "off"
       }
     ]
   },
@@ -67,14 +101,6 @@
     ]
   },
   {
-    "featureType": "administrative.province",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
     "featureType": "landscape.natural",
     "elementType": "geometry",
     "stylers": [
@@ -85,6 +111,14 @@
   },
   {
     "featureType": "poi",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
     "elementType": "geometry",
     "stylers": [
       {
@@ -94,27 +128,10 @@
   },
   {
     "featureType": "poi",
-    "elementType": "labels.text",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
     "elementType": "labels.text.fill",
     "stylers": [
       {
         "color": "#93817c"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.business",
-    "stylers": [
-      {
-        "visibility": "off"
       }
     ]
   },

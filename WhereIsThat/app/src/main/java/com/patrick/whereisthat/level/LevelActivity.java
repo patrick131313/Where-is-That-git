@@ -21,13 +21,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,13 +36,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.databinding.ActivityLevelBinding;
-import com.patrick.whereisthat.dialog.DialogImage;
 import com.patrick.whereisthat.dialog.DialogLevel;
 import com.patrick.whereisthat.levelsDB.Level;
 import com.patrick.whereisthat.levelsDB.LevelDao;
 import com.patrick.whereisthat.levelsDB.LevelDatabase;
 import com.patrick.whereisthat.levelsDB.Values;
-import com.patrick.whereisthat.login.LoginActivity;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
 
 import java.io.IOException;
@@ -88,6 +83,8 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public boolean isFinished=false;
     private boolean mRecord=false;
     DialogLevel mDialog;
+    private boolean clickedOne=false;
+
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -167,13 +164,15 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync((OnMapReadyCallback) this);
+
         mBinding.buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isFinished)
+                if(!isFinished && clickedOne==false)
                 {
                 StopTimer();
                 new ScoreTask().execute();
+                clickedOne=true;
                 //new ImageTask().execute();
                 }
                 else
@@ -233,6 +232,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMapClickListener(this);
         new MapTask().execute();
 
@@ -290,8 +290,10 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                     .position(new LatLng(latLng.latitude, latLng.longitude)));
             //  .title("Problem"));
             mLatLng = latLng;
-            if (mBinding.buttonConfirm.getVisibility() == View.INVISIBLE)
+            if (mBinding.buttonConfirm.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirm.setVisibility(View.VISIBLE);
+               clickedOne=false;
+            }
         }
         else
         {
@@ -600,7 +602,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
                     break;
                 case "4":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_standard));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));
 
                     break;
 
