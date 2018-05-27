@@ -3,18 +3,18 @@
 
     <string-array name="listStyle">
         <item>Dark</item>
-        <item>Retro</item>
         <item>Orange</item>
+        <item>Retro</item>
         <item>Yellow</item>
     </string-array>
 
     <string-array name="listMarker">
-        <item>Standard</item>
-        <item>Red Flag</item>
-        <item>Yellow Flag</item>
-        <item>Red Marker</item>
-        <item>Blue Marker</item>
-        <item>Red Thumbtack</item>
+        <item>Green</item>
+        <item>Magenta</item>
+        <item>Orange</item>
+        <item>Red</item>
+        <item>Violet</item>
+        <item>Yellow</item>
     </string-array>
 
     <string-array name="listValues">

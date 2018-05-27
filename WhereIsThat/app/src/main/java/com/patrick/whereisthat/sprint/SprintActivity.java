@@ -94,6 +94,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private Dialog mDialog;
     private MaterialDialog dialogCity;
     private boolean clickedOne=false;
+    private float markerColor;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -246,10 +247,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 mBinding.textViewCountdown.setText("Time: 00:00");
                 isFinished=true;
                 DialogRestart();
-              /*  if(mDialog!=null)
-                    mDialog.dismiss();
-                DialogRestart rDialog=new DialogRestart();
-                rDialog.show(getSupportFragmentManager(),"aaa");*/
+
 
 
             }
@@ -396,6 +394,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMapClickListener(this);
     }
     @Override
@@ -404,9 +403,15 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         mMap.clear();
         if(counter!=21 || !isFinished) {
+         /*   mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(latLng.latitude, latLng.longitude)));*/
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.yellow_flag)));
+                    .draggable(true)
+                    .icon(BitmapDescriptorFactory
+                            .defaultMarker(markerColor)));
+                    //.icon()
+                   // .icon(BitmapDescriptorFactory.fromResource(R.drawable.red_flag)));
             if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
                 clickedOne=false;
@@ -577,16 +582,44 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             super.onPostExecute(integer);
             mMap.getUiSettings().setMapToolbarEnabled(false);
             String map=sharedPreferences.getString("MapPref","4");
+            String marker=sharedPreferences.getString("MarkerPref","4");
+                Log.i("MarkerSettings", marker);
+            switch (marker)
+            {
+                case "1":
+                    markerColor=BitmapDescriptorFactory.HUE_GREEN;
+                    break;
+                case "2":
+                    markerColor=BitmapDescriptorFactory.HUE_MAGENTA;
+                    break;
+                case "3":
+                    markerColor=BitmapDescriptorFactory.HUE_ORANGE;
+                    break;
+                case "4":
+                    markerColor=BitmapDescriptorFactory.HUE_RED;
+                    break;
+                case "5":
+                    markerColor=BitmapDescriptorFactory.HUE_VIOLET;
+                    break;
+                case "6":
+                    markerColor=BitmapDescriptorFactory.HUE_YELLOW;
+                    break;
+                default:break;
+            }
             switch (map)
             {
                 case "1":
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
+                    mBinding.buttonConfirmSprint.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewSprintHs.setTextColor(getColor(R.color.colorWhite));
+                    mBinding.twRound.setTextColor(getColor(R.color.colorWhite));
+                    mBinding.textViewCountdown.setTextColor(getColor(R.color.colorWhite));
                     break;
                 case "2":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
                     break;
                 case "3":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
                     break;
                 case "4":
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));

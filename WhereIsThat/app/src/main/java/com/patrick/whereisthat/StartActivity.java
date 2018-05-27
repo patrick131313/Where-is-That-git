@@ -163,6 +163,12 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
                         startActivity(intent2);
                         break;
                         case R.id.invite_navigation_menu_item:
+                            Intent sendIntent = new Intent();
+                            sendIntent.setAction(Intent.ACTION_SEND);
+                            sendIntent.putExtra(Intent.EXTRA_SUBJECT,"Where is this game");
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, "Hi,you must try this game! #whereisthis"+System.getProperty("line.separator")+"www.whereisthis.com");
+                            sendIntent.setType("text/plain");
+                            startActivity(sendIntent);
                         break;
                     case R.id.settings_navigation_menu_item:
                         Intent intent3=new Intent(getApplicationContext(),SettingsActivity.class);

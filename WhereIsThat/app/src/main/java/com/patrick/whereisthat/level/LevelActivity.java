@@ -27,6 +27,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -84,6 +85,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     private boolean mRecord=false;
     DialogLevel mDialog;
     private boolean clickedOne=false;
+    private float markerColor;
 
 
     /**
@@ -285,9 +287,11 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void onMapClick(LatLng latLng) {
 
         mMap.clear();
-        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) {
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latLng.latitude, latLng.longitude)));
+        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) { mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latLng.latitude, latLng.longitude))
+                .draggable(true)
+                .icon(BitmapDescriptorFactory
+                        .defaultMarker(markerColor)));
             //  .title("Problem"));
             mLatLng = latLng;
             if (mBinding.buttonConfirm.getVisibility() == View.INVISIBLE) {
@@ -589,16 +593,43 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             super.onPostExecute(integer);
             mMap.getUiSettings().setMapToolbarEnabled(false);
             String map=sharedPreferences.getString("MapPref","4");
+            String marker=sharedPreferences.getString("MarkerPref","4");
+            switch (marker)
+            {
+                case "1":
+                    markerColor=BitmapDescriptorFactory.HUE_GREEN;
+                    break;
+                case "2":
+                    markerColor=BitmapDescriptorFactory.HUE_MAGENTA;
+                    break;
+                case "3":
+                    markerColor=BitmapDescriptorFactory.HUE_ORANGE;
+                    break;
+                case "4":
+                    markerColor=BitmapDescriptorFactory.HUE_RED;
+                    break;
+                case "5":
+                    markerColor=BitmapDescriptorFactory.HUE_VIOLET;
+                    break;
+                case "6":
+                    markerColor=BitmapDescriptorFactory.HUE_YELLOW;
+                    break;
+                default:break;
+            }
             switch (map)
             {
                 case "1":
                     mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
+                    mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewScore.setTextColor(getColor(R.color.colorWhite));
+                    mBinding.textViewTimer.setTextColor(getColor(R.color.colorWhite));
+                    mBinding.textViewWhere.setTextColor(getColor(R.color.colorWhite));
                     break;
                 case "2":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
                     break;
                 case "3":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_silver));
+                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
 
                     break;
                 case "4":
