@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +44,7 @@ import com.patrick.whereisthat.sprint.SprintActivity;
 import java.util.List;
 
 
-public class StartActivity extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
+public class StartActivity extends FragmentActivity {
 
     private GoogleMap mMap;
     private DrawerLayout mDrawerLayout;
@@ -51,7 +52,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
     public static final String EXTRA_USERNAME="USERNAME_KEY";
     private String mUser="";
     private TextView textView;
-
+    private ProgressBar mProgress;
     private Button mSprint;
     private boolean mInit;
 
@@ -63,10 +64,8 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
 
 
         mFirebaseAuth = FirebaseAuth.getInstance();
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
         setUpNavDrawer();
+        mProgress=findViewById(R.id.progress_user);
         mSprint=findViewById(R.id.button_sprint_mode);
         textView=findViewById(R.id.textView_user);
         textView.setVisibility(View.INVISIBLE);
@@ -90,6 +89,7 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
         }
         else
         {
+            mProgress.setVisibility(View.INVISIBLE);
             mInit=false;
             changeMenuToLogout();
             deleteUsername();
@@ -107,28 +107,6 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
      * installed Google Play services and returned to the app.
      */
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setOnMapClickListener(this);
-        // Add a marker in Sydney and move the camera
-        LatLng home = new LatLng(45.759282, 21.210157);
-        CameraPosition cp = CameraPosition.builder()
-                .target(home)
-                .zoom(8)
-                .bearing(0)
-                .tilt(0) //sau tilt 45
-                .build();
-      //  mMap.addMarker(new MarkerOptions().position(home).title("Marker in Sydney"));
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp), 1, null);
-        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_start_style));
-        mMap.getUiSettings().setMapToolbarEnabled(false);
-    }
-
-    @Override
-    public void onMapClick(LatLng latLng) {
-
-    }
     public void startGameClick(View view){
 
         if(!mUser.equals("")) {
@@ -213,10 +191,11 @@ public class StartActivity extends FragmentActivity implements OnMapReadyCallbac
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //String userName=dataSnapshot.getValue().toString();
-               // Log.d("MyRef",userName);
+
+                mProgress.setVisibility(View.INVISIBLE);
                 setUsername(dataSnapshot.getValue().toString());
                 mUser=dataSnapshot.getValue().toString();
+
             }
 
             @Override

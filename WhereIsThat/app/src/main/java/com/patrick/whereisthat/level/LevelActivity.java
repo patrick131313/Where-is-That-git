@@ -451,7 +451,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                     .allowMainThreadQueries()
                     .build();
             levelDao = db.levelDao();
-            // levelDao.deleteAll();
+           // levelDao.deleteAll();
             if (db.levelDao().lines() == 0) {
                 Values values = new Values();
                 levelList = values.getValues();

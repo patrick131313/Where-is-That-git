@@ -27,11 +27,17 @@
         android:textColor="@color/colorBlack"
         android:layout_toRightOf="@+id/image_view_level"
         android:layout_margin="8dp"/>
+    <ProgressBar
+        android:id="@+id/level_progress"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_toRightOf="@+id/textView_highscore"
+        android:layout_below="@id/textView_level"/>
     <TextView
         android:id="@+id/textView_highscore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Your highscore:"
+        tools:text="Highscore:"
         android:textSize="18sp"
         android:layout_toRightOf="@+id/image_view_level"
         android:layout_below="@+id/textView_level"

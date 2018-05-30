@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ public class SelectLevelActivity extends AppCompatActivity {
     public static final String EXTRA_OVERALL_KEY="OVERALL_KEY";
     private int mLastPlayed;
     private long prevLevel;
+    private boolean empty;
 
     private String []mArrayLevels={"Level 1","Level 2","Level 3","Level 4","Level 5","Level 6",
             "Level 7","Level 8","Level 9","Level 10","Level 11"};
@@ -142,11 +144,11 @@ public class SelectLevelActivity extends AppCompatActivity {
             if(mHigscores.isEmpty())
             {
 
-                holder.mHighscore.setText("Higscore:0");
+                holder.mHighscore.setText("Higscore");
             }
             else
             {
-
+                holder.mProgress.setVisibility(View.INVISIBLE);
                 final Object score=mHighscores.get("level"+String.valueOf(position+1));
                 holder.mHighscore.setText("Higscore:"+score.toString());
                 if(position!=0)
@@ -203,11 +205,13 @@ public class SelectLevelActivity extends AppCompatActivity {
           public TextView mLevel;
           public TextView mHighscore;
           public RelativeLayout mLevelItem;
+          public ProgressBar mProgress;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 Log.d("RecyclerView", "view holder");
 
+                mProgress=itemView.findViewById(R.id.level_progress);
                 mImageView = itemView.findViewById(R.id.image_view_level);
                 mLevel = itemView.findViewById(R.id.textView_level);
                 mHighscore = itemView.findViewById(R.id.textView_highscore);
@@ -225,11 +229,6 @@ public class SelectLevelActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String string="level3";
                mHighscores=dataSnapshot.getValue(FirebaseScores.class).getScores();
-            /*    Log.d("Map",mHighscores.toString());
-                Object score=mHighscores.get("level2");
-                Log.d("MapLevel3",score.toString());
-                score=mHighscores.get("level"+String.valueOf(5));
-                Log.d("MapLevel35",score.toString());*/
                mAdapter.ReplaceData(mHighscores);
 
             }
@@ -239,8 +238,6 @@ public class SelectLevelActivity extends AppCompatActivity {
 
             }
         });
-      /*  Log.d("Key",key);
-        Log.d("Query",myRef.toString());*/
 
     }
 
