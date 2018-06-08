@@ -3,6 +3,7 @@ package com.patrick.whereisthat.scores;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +24,8 @@ public class ScoreLevel7 extends Fragment {
     RecyclerViewAdapter mRecylerViewAdapter;
     LinearLayoutManager mLayoutManager;
     String mUser;
+    SwipeRefreshLayout mRefreshLayout;
+
     public ScoreLevel7()
     {
 
@@ -32,15 +35,21 @@ public class ScoreLevel7 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View ScoreLevel7=inflater.inflate(R.layout.scores_rv,container,false);
+        mRefreshLayout=ScoreLevel7.findViewById(R.id.swipeRefresh);
         mLayoutManager=new LinearLayoutManager(getContext());
-    //    mLayoutManager.setReverseLayout(true);
-    //    mLayoutManager.setStackFromEnd(true);
         mRecyclerView=ScoreLevel7.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
         mRecyclerView.setHasFixedSize(true);
         DividerItemDecoration dividerItemDecoration=new DividerItemDecoration(getContext(),mLayoutManager.getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                GetScores.getScoresLevel("level7",mRecylerViewAdapter,mUser);
+                mRefreshLayout.setRefreshing(false);
+            }
+        });
         return ScoreLevel7;
     }
 

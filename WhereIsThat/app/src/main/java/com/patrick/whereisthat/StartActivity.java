@@ -60,11 +60,10 @@ public class StartActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
-
-
         mFirebaseAuth = FirebaseAuth.getInstance();
         setUpNavDrawer();
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+
         mProgress=findViewById(R.id.progress_user);
         mSprint=findViewById(R.id.button_sprint_mode);
         textView=findViewById(R.id.textView_user);
@@ -95,18 +94,6 @@ public class StartActivity extends FragmentActivity {
             deleteUsername();
         }
     }
-
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-
     public void startGameClick(View view){
 
         if(!mUser.equals("")) {
@@ -157,7 +144,6 @@ public class StartActivity extends FragmentActivity {
 
                         if(title.equals("Logout"))
                         {
-                        //    mFirebaseAuth.signOut();
                             FirebaseAuth.getInstance().signOut();
                             logoutToast();
                             changeMenuToLogout();
@@ -191,7 +177,6 @@ public class StartActivity extends FragmentActivity {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 mProgress.setVisibility(View.INVISIBLE);
                 setUsername(dataSnapshot.getValue().toString());
                 mUser=dataSnapshot.getValue().toString();
@@ -208,7 +193,7 @@ public class StartActivity extends FragmentActivity {
 
     public void setUsername(String username)
     {
-        textView.setText("You are logged in as:"+username);
+        textView.setText("You are logged in as: "+username);
         textView.setVisibility(View.VISIBLE);
     }
     public void deleteUsername()
@@ -226,8 +211,6 @@ public class StartActivity extends FragmentActivity {
         item.setTitle("Login");
         item.setIcon(ContextCompat.getDrawable(this,R.drawable.ic_login_24dp));
         mUser="";
-       /* item.setTitle("Tezd");
-        item.setIcon(ContextCompat.getDrawable(this,R.drawable.ic_share_24dp));*/
     }
     public void logoutToast()
     {

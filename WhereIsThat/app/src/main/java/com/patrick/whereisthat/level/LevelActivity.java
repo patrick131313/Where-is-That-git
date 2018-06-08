@@ -148,17 +148,14 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         super.onCreate(savedInstanceState);
 
         mBinding= DataBindingUtil.setContentView(this,R.layout.activity_level);
-     //   mImageView=findViewById(R.id.image_view_db);
-      //  mConfirm=findViewById(R.id.button_confirm);
+
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mLevel=getIntent().getStringExtra(SelectLevelActivity.EXTRA_LEVEL_KEY);
         mHigscore= getIntent().getStringExtra(SelectLevelActivity.EXTRA_HIGHSCORE_KEY);
         mOverall=getIntent().getStringExtra(SelectLevelActivity.EXTRA_OVERALL_KEY);
-     //  Toast.makeText(getApplicationContext(),mOverall,Toast.LENGTH_LONG).show();
         new DataTask().execute();
 
-        //
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.map);
@@ -175,7 +172,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 StopTimer();
                 new ScoreTask().execute();
                 clickedOne=true;
-                //new ImageTask().execute();
                 }
                 else
                 {
@@ -199,8 +195,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mBinding.buttonHint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             //   mBinding.textViewHint.setVisibility(View.VISIBLE);
-            //    mBinding.imageViewHint.setVisibility(View.VISIBLE);
                 showDialog();
                 hint_pressed=true;
 
@@ -237,7 +231,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMapClickListener(this);
         new MapTask().execute();
-
 
     }
 
@@ -287,12 +280,12 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     public void onMapClick(LatLng latLng) {
 
         mMap.clear();
-        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) { mMap.addMarker(new MarkerOptions()
+        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) {
+            mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(latLng.latitude, latLng.longitude))
                 .draggable(true)
                 .icon(BitmapDescriptorFactory
                         .defaultMarker(markerColor)));
-            //  .title("Problem"));
             mLatLng = latLng;
             if (mBinding.buttonConfirm.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirm.setVisibility(View.VISIBLE);
@@ -326,7 +319,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 if (city.equals(levelList.get(mCurrent-1).getCity()))
                     score_city();
                 else {
-                    // LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()), Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
                     score(dbLatLng, mLatLng);
                 }
             }
@@ -334,8 +326,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             e.printStackTrace();
             Log.d("Bundle_error", e.toString());
             score(dbLatLng, mLatLng);
-            //   Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-
         }
     }
 
@@ -365,12 +355,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mScoreRound=Score;
         mScore=mScore+Score;
 
-    //   Toast.makeText(getApplicationContext(),"Distance:"+String.valueOf(distance),Toast.LENGTH_SHORT).show();
-      //  Toast.makeText(getApplicationContext(),"Current:"+String.valueOf(mCurrent),Toast.LENGTH_SHORT).show();
     }
     public void score_city()
     {
-
         long Score=5000-(long)(updateTime*0.1);
         if(hint_pressed)
             Score=Score-1000;
@@ -379,9 +366,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mScoreRound=Score;
         mScore=mScore+Score;
         mDistance=0;
-    //    mBinding.textViewScore.setText(String.valueOf(mScore));
-
-     //   Toast.makeText(getApplicationContext(),"Current:"+String.valueOf(mCurrent),Toast.LENGTH_SHORT).show();
     }
     Runnable updateTimerThread = new Runnable() {
         @Override
@@ -458,7 +442,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 Log.i(TAG, "onCreate: db: " + levelList.toString());
                 Log.i(TAG, "onCreate: db: " + values.getValues().toString());
                 levelDao.insertAll(levelList);
-
             }
             switch (mLevel) {
                 case "1":
@@ -535,24 +518,15 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
 
+            if(mCurrent==0)
+            {
+                StartTimer();
+            }
             if(integer==-1) {
-              /*  mBinding.imageViewDb.setVisibility(View.INVISIBLE);
-                mBinding.imageViewClose.setVisibility(View.INVISIBLE);
-                Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
-                mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
-                mBinding.buttonHint.setVisibility(View.INVISIBLE);
-                mBinding.textViewTimer.setVisibility(View.INVISIBLE);
-                mCurrent=10;
-                isFinished=true;
-                mMap.clear();
-                UpdateScore();
-            //    mDialog.dismiss();
-            //    finish();*/
                 mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
                 UpdateScore();
             }
             else {
-          //      mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
                 mMap.clear();
                 mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
                 hint_pressed=false;
@@ -572,7 +546,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 mCurrent++;
 
                 Log.i(TAG, "onPostExecute: " + String.valueOf(mCurrent));
-              //  StartTimer();
             }
         }
     }
@@ -640,17 +613,16 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 default:break;
 
             }
-          //  mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
             LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);
             mMap.setLatLngBoundsForCameraTarget(Europe);
-           new VisibleTask().execute();
+    //       new VisibleTask().execute();
 
         }
     }
 
-    public class VisibleTask extends AsyncTask<Void,Void,Void>
+/*    public class VisibleTask extends AsyncTask<Void,Void,Void>
     {
 
         @Override
@@ -667,12 +639,10 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 mBinding.textViewScore.setVisibility(View.VISIBLE);
                 mBinding.textViewTimer.setVisibility(View.VISIBLE);
                 mBinding.buttonHint.setVisibility(View.VISIBLE);
-
-                //      mBinding.buttonConfirm.setVisibility(View.VISIBLE);
                 StartTimer();
             }
         }
-    }
+    }*/
     public class ScoreTask extends AsyncTask<Void,Void,Void>
     {
 
@@ -697,20 +667,17 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             bundle.putLong("Score",mScore);
             bundle.putFloat("Distance",mDistance);
             mDialog.setArguments(bundle);
-            //mDialog.setArguments(bundle);
-            // mCountDownTimer.cancel();
-            // mCountDownTimer.onFinish();
             mDialog.setCancelable(false);
             mDialog.show(getSupportFragmentManager(),"aaa");
 
-           // StartTimer();
         }
     }
 
     public void makeToast()
     {
         if(mRecord)
-            Toast.makeText(getApplicationContext(), "You've beat your level "+mLevel+ " record, now your highscore is "+mScore+" points!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "You've beat your level "+mLevel+ " record, now your highscore is "+mScore+" points!",
+                    Toast.LENGTH_SHORT).show();
             else
 
         Toast.makeText(getApplicationContext(), "You've finished level "+mLevel+ " with "+mScore+" points!", Toast.LENGTH_SHORT).show();

@@ -55,17 +55,8 @@ public class SelectLevelActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
             getScores();
-
-
-
-
         Log.d("Map",mHighscores.toString());
-
-
         setContentView(R.layout.activity_select_level);
         android.support.v7.app.ActionBar actionBar=this.getSupportActionBar();
         if(actionBar!=null)
@@ -83,9 +74,6 @@ public class SelectLevelActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
         Log.d("RecyclerView", "created");
 
-     //   Log.d("List",mList.toString());
-
-
 
     }
 
@@ -101,12 +89,10 @@ public class SelectLevelActivity extends AppCompatActivity {
 
         
         private String[] mArrayLevels;
-         private Map<String,Long> mHigscores;
-        //private int mNumber;
+        private Map<String,Long> mHigscores;
         private Context mContext;
         public RecyclerViewAdapter(Context mContext,String []mArrayLevels, Map<String,Long> mHighscores)
         {
-        //    this.mNumber=mNumber;
             this.mHigscores=mHighscores;
             this.mArrayLevels=mArrayLevels;
           
@@ -127,15 +113,10 @@ public class SelectLevelActivity extends AppCompatActivity {
             View view=inflater.inflate(R.layout.level_item,parent,false);
             ViewHolder viewHolder=new ViewHolder(view);
             return viewHolder;
-
-
-
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-       
-            //Object score=mHighscores.get("level"+String.valueOf(position+1));
             int level=position+1;
                 Log.i("Imagechanged",  String.valueOf(position));
                 holder.mImageView.setImageResource(getResources().getIdentifier("ic_"+String.valueOf(level), "drawable", getPackageName()));
@@ -159,8 +140,6 @@ public class SelectLevelActivity extends AppCompatActivity {
                 if ((position == 0) || (position != 0 && prevLevel != 0)) {
                     mLastPlayed = position + 1;
                 }
-
-
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

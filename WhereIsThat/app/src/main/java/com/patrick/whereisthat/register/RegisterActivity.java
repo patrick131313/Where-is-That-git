@@ -80,8 +80,6 @@ public class RegisterActivity extends AppCompatActivity {
                 final String rpassword=mRPassword.getText().toString();
                 Log.d("Email:", email.toString());
                 Log.d("Password:", password.toString());
-               // if (!isEmailValid(email) || email.equals("") || user.equals("")||(password.equals("")||mPassword.equals("")||(!rpassword.equals(password))))
-               //     register=false;
                 if(email.equals("") || user.equals("")||(password.equals("")||rpassword.equals("")))
                  {
                      Toast.makeText(getApplicationContext(), "You must complete all fields", Toast.LENGTH_LONG).show();
@@ -99,7 +97,11 @@ public class RegisterActivity extends AppCompatActivity {
                         if((!rpassword.equals(password)))
                         {
                             Toast.makeText(getApplicationContext(), "Passwords don't match", Toast.LENGTH_LONG).show();
-
+                            register = false;
+                        }
+                        if(password.length()<6)
+                        {
+                            Toast.makeText(getApplicationContext(), "Password is too short, must have minimum 6 characters", Toast.LENGTH_LONG).show();
                             register = false;
                         }
                     }
@@ -122,8 +124,6 @@ public class RegisterActivity extends AppCompatActivity {
         Log.d("Query", email.toString());
         Log.d("Query", user.toString());
         Log.d("Query",password.toString());
-        //mFirebaseAuth.signInAnonymously();
-       // mFirebaseAuth.signInWithEmailAndPassword("suciu.patrick@gmail.coom","patrick1313");
         DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
         Log.d("Query",myRef.toString());
                 Query query=myRef.child("users").orderByChild("user").equalTo(user);
@@ -134,12 +134,9 @@ public class RegisterActivity extends AppCompatActivity {
                         if(dataSnapshot.exists()) {
                             Log.d("Query", "User exits");
                             toastExits();
-
-
                         }
                         else {
                             Log.d("Query", "You can add this user");
-                            //toastSuccesful();
                             mFirebaseAuth.createUserWithEmailAndPassword(email, password).
                                     addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                                         @Override
@@ -160,12 +157,8 @@ public class RegisterActivity extends AppCompatActivity {
                                                 userDb.child("scores").updateChildren(level);
                                                 info.put("sprint_mode", 0);
                                                 userDb.updateChildren(info);
-                                            /*    Intent intent=new Intent(getApplication(), StartActivity.class);
-                                                startActivity(intent);*/
-
 
                                             } else {
-                                              //  Toast.makeText(getApplication(), "Error", Toast.LENGTH_LONG).show();
                                             }
                                         }
                                     }

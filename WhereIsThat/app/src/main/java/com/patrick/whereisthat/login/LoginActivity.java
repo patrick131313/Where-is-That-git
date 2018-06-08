@@ -72,11 +72,11 @@ public class LoginActivity extends AppCompatActivity {
                 String email = mEmail.getText().toString();
                 String password = mPassword.getText().toString();
                 if (email.equals("") || password.equals("")) {
-                    Toast.makeText(getApplicationContext(), "You must complete all fields", Toast.LENGTH_LONG).show();
+                    fieldToast();
                     login = false;
                 } else {
                     if (!isEmailValid(email)) {
-                        Toast.makeText(getApplicationContext(), "Email adress is not valid", Toast.LENGTH_LONG).show();
+                      emailToast();
                         login = false;
                     }
                 }
@@ -85,10 +85,8 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                makeToast();
-                                //    goToStartActivity();
+                                loginToast();
                             } else {
-
                                 errorToast();
                             }
                         }
@@ -119,13 +117,22 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void makeToast() {
+    public void loginToast() {
         Toast.makeText(this, "You are logged in", Toast.LENGTH_LONG).show();
     }
 
     public void errorToast() {
         Toast.makeText(this, "Verify your email and your password", Toast.LENGTH_LONG).show();
     }
+    public void fieldToast()
+    {
+        Toast.makeText(this, "You must complete all fields", Toast.LENGTH_LONG).show();
+    }
+    public void emailToast()
+    {
+        Toast.makeText(this, "Email adress is not valid", Toast.LENGTH_LONG).show();
+    }
+
 
 
     @Override

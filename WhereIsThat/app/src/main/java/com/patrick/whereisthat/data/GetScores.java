@@ -9,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.patrick.whereisthat.scores.RecyclerViewAdapter;
+import com.patrick.whereisthat.scores.ScoreLevel1;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -22,73 +23,6 @@ import javax.security.auth.login.LoginException;
  */
 
 public class GetScores {
-
-
-   /* public static void getScoresLevel(final String level, final RecyclerViewAdapter mRecylerViewAdapter) {
-        final List<ScoresRank> scoreList = new ArrayList<ScoresRank>();
-        Query query;
-        ValueEventListener eventListener;
-        final DatabaseReference myRef = FirebaseDatabase.getInstance().getReference();
-
-        query = myRef.child("users").orderByChild("scores/" + level);
-        query.addListenerForSingleValueEvent(eventListener=new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                // Log.i("Snapshot", "onDataChange: "+dataSnapshot.toString());
-                int total = (int) dataSnapshot.getChildrenCount();
-                     Log.i("Snapshot", "onDataChange:"+String.valueOf(total));
-                for(DataSnapshot snapshot:dataSnapshot.getChildren())
-                {
-
-                    Log.i("Snapshot",snapshot.toString());
-                    ScoresRank score=new ScoresRank(snapshot.child("user").getValue().toString(),snapshot.child("scores/"+level).getValue().toString());
-                    ///     if(score.getUser().equals("patrick1313"))
-
-
-
-                    scoreList.add(score);
-
-                    Log.i("Snapshot",snapshot.child("scores/"+level).getValue().toString());
-                    Log.i("Snapshot",snapshot.child("user").getValue().toString());
-                    Log.i("ScoreList",scoreList.toString());
-                }
-                final List<ScoresRank> finalList = new ArrayList<ScoresRank>(scoreList);
-                Collections.reverse(finalList);
-                int mLastPosition=0;
-                String mLastScore="-1";
-                int i=0;
-                for(ScoresRank rank:finalList)
-                {
-                 if(mLastPosition!=0 && rank.getScore().equals((mLastScore)))
-                    {
-                        finalList.get(i).setUser(String.valueOf(mLastPosition)+"."+rank.getUser());
-                        i++;
-                    }
-                    else
-                    {
-                        Log.i("ForRank", "onDataChange: "+String.valueOf(i));
-
-                        mLastPosition=i+1;
-                        mLastScore=rank.getScore();
-                        finalList.get(i).setUser(String.valueOf(i+1)+"."+rank.getUser());
-                        i++;
-                    }
-
-                }
-
-                mRecylerViewAdapter.ReplaceData(finalList);
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        query.removeEventListener(eventListener);
-
-    }*/
 
     public static void getScoresLevel(final String level, final RecyclerViewAdapter mRecylerViewAdapter, final String username) {
         final List<ScoresRank> scoreList = new ArrayList<ScoresRank>();
@@ -113,10 +47,6 @@ public class GetScores {
 
 
 
-                    scoreList.add(score);
-                    scoreList.add(score);
-                    scoreList.add(score);
-                    scoreList.add(score);
                     scoreList.add(score);
 
 

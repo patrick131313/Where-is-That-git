@@ -59,20 +59,12 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
 
                 }
                 else {
-                    //    mConfirm.callOnClick();
                     dismiss();
                 }
-                //       ((SprintActivity)getActivity()).StartTimer();
-                //      ((SprintActivity)getActivity()).mCountDownTimer.start();
+
 
             }
         });
-       /*if (dialog != null) {
-            int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height=2000;
-            dialog.getWindow().setLayout(width, height);
-
-        }*/
     }
     @Nullable
     @Override
