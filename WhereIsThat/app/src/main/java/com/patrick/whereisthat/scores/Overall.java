@@ -42,8 +42,6 @@ public class Overall extends Fragment {
         View Overall=inflater.inflate(R.layout.scores_rv,container,false);
         mRefreshLayout=Overall.findViewById(R.id.swipeRefresh);
         mLayoutManager=new LinearLayoutManager(getContext());
-     //   mLayoutManager.setReverseLayout(true);
-     //   mLayoutManager.setStackFromEnd(true);
         mRecyclerView=Overall.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);

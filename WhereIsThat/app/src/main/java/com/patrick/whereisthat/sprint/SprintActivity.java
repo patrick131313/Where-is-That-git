@@ -81,7 +81,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     ActivitySprintBinding mBinding;
     boolean isReady=false;
     private long mTimeRemaining;
-    private long mTime=60000;
+    private long mTime=120000;
     public CountDownTimer mCountDownTimer;
     private String mCurrent="DB";
     private long mScore=0;
@@ -170,7 +170,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mContentView = findViewById(R.id.map_sprint);
         new SprintTask().execute();
         new MapTask().execute();
-        new DialogFirst().execute();
 
         mBinding.textViewCountdown.setText("2:00:00");
         StartTimer();
@@ -186,7 +185,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onClick(View view) {
                 if (mTask.getStatus() == AsyncTask.Status.RUNNING) {
-                    mTask.cancel(false);
+                    mTask.cancel(true);
                     if (mTask.isCancelled()) {
                         Log.i("zz", "doInBackground:cancelled ");
                     }
@@ -199,9 +198,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     } else {
                         new ScoreTask().execute();
                         new NextCityTask().execute();
-                        //       mCountDownTimer.onFinish();
-                        //    mTime=mTimeRemaining;
-
                     }
                 }
                 clickedOne=true;
@@ -247,9 +243,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 mBinding.textViewCountdown.setText("Time: 00:00");
                 isFinished=true;
                 DialogRestart();
-
-
-
             }
 
 
@@ -403,23 +396,18 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         mMap.clear();
         if(counter!=21 || !isFinished) {
-         /*   mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latLng.latitude, latLng.longitude)));*/
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude))
                     .draggable(true)
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(markerColor)));
-                    //.icon()
-                   // .icon(BitmapDescriptorFactory.fromResource(R.drawable.red_flag)));
             if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
                 clickedOne=false;
             }
             mLatLng = latLng;
         }
-        // if(mBinding.buttonConfirm.getVisibility()==View.INVISIBLE)
-        //      mBinding.buttonConfirm.setVisibility(View.VISIBLE);
+     
     }
 
     public float getDistance(LatLng LatLng1, LatLng LatLng2) {
@@ -468,14 +456,12 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         switch (mCurrent)
         {
             case "DB":
-                //  Toast.makeText(getApplicationContext(),"From Database",Toast.LENGTH_LONG).show();
                 Log.i("Aa", "getCity:DB called");
                 city_name=sprintList.get(counter).getCity();
                 Log.i("City_name", city_name);
                 dbLatLng=new LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
                 break;
             case "Random":
-                //  Toast.makeText(getApplicationContext(),"Random",Toast.LENGTH_LONG).show();
                 city_name=mCities.get(counter).getCity();
                 Log.i("City_name", city_name);
                 dbLatLng=new LatLng(Double.parseDouble(mCities.get(counter).getLatitude()),Double.parseDouble(mCities.get(counter).getLongitude()));
@@ -502,13 +488,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 if(city==null)
                     city="z";
                 Log.i("Aa", "getCity: "+city);
-                //  Log.i(TAG, "getCity: "+levelList.get(mCurrent-1).getCity());
                 if (city.equals(city_name))
-                    // Log.i("Aa", "getCity: City equals");
                     score_city();
 
                 else {
-                    // LatLng dbLatLng = new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()), Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
                     score(dbLatLng, mLatLng);
 
                     Log.i("Aa", "getCity: Cities not equals");
@@ -517,8 +500,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         } catch (IOException e) {
             e.printStackTrace();
             Log.d("Bundle_error", e.toString());
-            //   score(dbLatLng, mLatLng);
-            //   Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -530,7 +511,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         @Override
         protected List<Sprint> doInBackground(Void... voids) {
-
             List<Sprint> SprintList=new ArrayList<>();
             SprintDatabase db = Room.databaseBuilder(getApplicationContext(), SprintDatabase.class, "sprint")
                     .allowMainThreadQueries()
@@ -558,12 +538,9 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             for (int i = 0; i < sprintList.size(); i++) {
                 Log.i("aaaa", "onCreate: db: " + sprintList.get(i).getCity());
             }
-          //  mBinding.textViewSprint.setText(sprintList.get(0).getCity());
             mBinding.closeCitySprint.setVisibility(View.VISIBLE);
             mCountDownTimer.start();
-
-            //    Toast.makeText(getApplicationContext(),String.valueOf(sprints.size()),Toast.LENGTH_SHORT).show();
-            //
+            DialogCity(sprintList.get(0).getCity());
         }
     }
     public class MapTask extends AsyncTask<Void, Void, Integer> //map style etc
@@ -634,10 +611,10 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);
             mMap.setLatLngBoundsForCameraTarget(Europe);
-            mTask=new MarkerTask().execute();
+            mTask=new SearchCitiesTask().execute();
         }
     }
-    public class DialogFirst extends AsyncTask<Void,Void,Void>
+  /*  public class DialogFirst extends AsyncTask<Void,Void,Void>
     {
 
         @Override
@@ -650,9 +627,9 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             super.onPostExecute(aVoid);
             DialogCity(sprintList.get(0).getCity());
         }
-    }
+    }*/
 
-    public class MarkerTask extends AsyncTask<Void,Void,List<LatLng>> { //cautare orase random
+    public class SearchCitiesTask extends AsyncTask<Void,Void,List<LatLng>> {
 
 
         @Override
@@ -697,10 +674,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                             latLngs.add(latLng1);
                             nr_cities++;
                             Log.i("zz", "doInBackground: "+String.valueOf(nr_cities)+":"+String.valueOf(adresses.get(0).getLocality()));
-
-
-                            //   Toast.makeText(getApplicationContext(), adresses.get(0).getLocality().toString(), Toast.LENGTH_LONG).show();
-
                         }
                     }
 
@@ -739,21 +712,19 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     counter++;
                     mCurrent="Random";
                     return mCities.get(counter).getCity();
-                    //   mText.setText(mCities.get(counter).getCity());
+
                 }
 
 
             }
             return null;
         }
-
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.i("Counter", String.valueOf(counter));
             if(counter==20)
             {
-                //     Toast.makeText(getApplicationContext(),"Level completed"+mTimeRemaining/10,Toast.LENGTH_LONG).show();
                 mCountDownTimer.cancel();
                 mScore=mScore+mTimeRemaining/10;
                 mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
@@ -763,26 +734,15 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 mBinding.textViewSprint.setVisibility(View.INVISIBLE);
                 mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
                 mBinding.twRound.setText("Round: 20/20");
-
-
             }
             else {
-                if (isFinished) {
-                    mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
                     mMap.clear();
-                    mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
-                    mBinding.textViewSprint.setVisibility(View.INVISIBLE);
-                    mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
-                } else {
-                    mMap.clear();
-                //    mBinding.textViewSprint.setText(s);
                     DialogCity(s);
                     mBinding.twRound.setText("Round: "+String.valueOf(counter + 1) + "/20");
                     mBinding.textViewSprint.setVisibility(View.VISIBLE);
                     mBinding.closeCitySprint.setVisibility(View.VISIBLE);
                     mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
-                    mTask = new MarkerTask().execute();
-                }
+                    mTask = new SearchCitiesTask().execute();
             }
         }
     }

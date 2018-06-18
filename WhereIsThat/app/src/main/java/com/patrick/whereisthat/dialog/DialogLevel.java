@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,8 +34,7 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-       setStyle(DialogFragment.STYLE_NO_FRAME, R.style.AppTheme);
+       setStyle(DialogFragment.STYLE_NO_FRAME, R.style.FullscreenTheme);
 
     }
 
@@ -44,6 +44,8 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
     public void onStart() {
         super.onStart();
         ((LevelActivity)getActivity()).new ImageTask().execute();;
+
+
         android.app.Dialog dialog=getDialog();
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

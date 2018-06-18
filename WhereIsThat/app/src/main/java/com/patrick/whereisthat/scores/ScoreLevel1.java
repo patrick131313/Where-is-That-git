@@ -57,8 +57,6 @@ public class ScoreLevel1 extends Fragment {
         View ScoreLevel1=inflater.inflate(R.layout.scores_rv,container,false);
         mRefreshLayout=ScoreLevel1.findViewById(R.id.swipeRefresh);
         mLayoutManager=new LinearLayoutManager(getContext());
-      //  mLayoutManager.setReverseLayout(true);
-     //   mLayoutManager.setStackFromEnd(true);
         mRecyclerView=ScoreLevel1.findViewById(R.id.rw_scores);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecylerViewAdapter);
@@ -66,7 +64,6 @@ public class ScoreLevel1 extends Fragment {
         DividerItemDecoration dividerItemDecoration=new DividerItemDecoration(getContext(),mLayoutManager.getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
-       // Log.i("Score", "onCreateView: "+mUser);
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -81,19 +78,13 @@ public class ScoreLevel1 extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
-   //     mRecylerViewAdapter=new RecyclerViewAdapter();
+
 
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
         mRecylerViewAdapter.TransferAdapter(mRecylerViewAdapter);
 
         GetScores.getScoresLevel("level1",mRecylerViewAdapter,mUser);
-         // getScoresLevel("level3");
-//        scoreListLevel1=GetScores.getScoresLevel("level1");
-    //    scoreListLevel1.add(new ScoresRank("aaaa","111"));
-  //      Log.i("OnCreateScoreList", scoreListLevel1.toString());
-    //    mRecylerViewAdapter=new RecyclerViewAdapter(scoreListLevel1);
         Log.i("ScoreLevel1", "onCreate: ");
-      //  new ScoresAsync().execute();
 
 
     }
@@ -104,8 +95,4 @@ public class ScoreLevel1 extends Fragment {
     {
         Toast.makeText(getContext(),snapshot.toString(),Toast.LENGTH_LONG).show();
     }
-
-
-
-
 }

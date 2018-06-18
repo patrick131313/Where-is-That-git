@@ -37,11 +37,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private SearchView searchView;
     private RecyclerViewAdapter mAdapter;
     private ScoresRank userLogged;
- /*   public RecyclerViewAdapter(List<ScoresRank> ranks)
-    {
-        this.mArrayFiltered=ranks;
-        this.mArray=ranks;
-    }*/
     public RecyclerViewAdapter(){
 
     }
@@ -108,14 +103,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         {
 
             if(!Username.equals("") &&mArray.size()>0) {
-
-
                 holder.mUser.setText(Html.fromHtml("Logged user:"+"<b>"+mArray.get(mArray.size() - 1).getUser().toString()+"</b>"));
                 holder.mScore.setText(Html.fromHtml("Points:" + "<b>"+mArray.get(mArray.size() - 1).getScore().toString()+"</b>"));
                 holder.mPosition.setText(Html.fromHtml("Rank:" +"<b>"+ String.valueOf(mArray.get(mArray.size() - 1).getPosition())+"</b>"));
-          /*      holder.mUser.setText(userLogged.getUser().toString());
-                holder.mScore.setText("Score:" + userLogged.getScore().toString());
-                holder.mPosition.setText("Rank:" +userLogged.getPosition());*/
+
             }
 
 
@@ -150,13 +141,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
         }
-
-
-
-
     }
-
-
     @Override
     public int getItemViewType(int position) {
 
@@ -181,13 +166,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                             arrayList.add(string);
                         }
                     }
-     /*               if (!Username.equals("")) {
-                        Log.i("FilterUser", Username.toString());
-                        arrayList.add(new ScoresRank("1", "11", 0));
-                        if (arrayList.get(arrayList.size() - 2).getUser().equals(Username))
-                            arrayList.remove(arrayList.size() - 2);*/
                         mArrayFiltered = arrayList;
-                 //   }
+
                 }
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = mArrayFiltered;
@@ -203,12 +183,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 }
                 Log.i("Filter", "----------");
-
-
-             /*   if(!Username.equals(""))
-                {
-                    mArrayFiltered.remove(mArrayFiltered.size()-1);
-                }*/
                 notifyDataSetChanged();
             }
         };

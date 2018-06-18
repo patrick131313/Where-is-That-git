@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -86,6 +87,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     DialogLevel mDialog;
     private boolean clickedOne=false;
     private float markerColor;
+    LatLngBounds Europe;
 
 
     /**
@@ -171,6 +173,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 {
                 StopTimer();
                 new ScoreTask().execute();
+               // mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(54,10.25)));
                 clickedOne=true;
                 }
                 else
@@ -613,7 +616,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                 default:break;
 
             }
-            LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
+            Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);
             mMap.setLatLngBoundsForCameraTarget(Europe);

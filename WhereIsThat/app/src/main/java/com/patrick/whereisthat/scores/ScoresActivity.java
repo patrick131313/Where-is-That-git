@@ -23,16 +23,12 @@ public class ScoresActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mSectionsPageAdapter=new SectionsPageAdapter(getSupportFragmentManager());
         user=getIntent().getStringExtra(StartActivity.EXTRA_USERNAME);
-        //Toast.makeText(getApplicationContext(),user,Toast.LENGTH_LONG).show();
         mViewPager=findViewById(R.id.view_pager_scores);
-
         setupViewPager(mViewPager);
 
         TabLayout tabLayout=findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-      //  tabLayout.computeScroll();
-      //  tabLayout.isNestedScrollingEnabled(true)
     }
 
     private void setupViewPager(ViewPager viewPager)
@@ -41,6 +37,7 @@ public class ScoresActivity extends AppCompatActivity {
         bundle.putString("Username",user);
         ScoreLevel1 level1=new ScoreLevel1();
         level1.setArguments(bundle);
+
         SectionsPageAdapter adapter=new SectionsPageAdapter(getSupportFragmentManager());
         adapter.addFragment(level1,"Level1");
 
@@ -92,17 +89,6 @@ public class ScoresActivity extends AppCompatActivity {
         scoreSprint.setArguments(bundle);
         adapter.addFragment(scoreSprint,"Sprint mode");
 
-       /* adapter.addFragment(new ScoreLevel3(),"Level3");
-        adapter.addFragment(new ScoreLevel4(),"Level4");
-        adapter.addFragment(new ScoreLevel5(),"Level5");
-        adapter.addFragment(new ScoreLevel6(),"Level6");
-        adapter.addFragment(new ScoreLevel7(),"Level7");
-        adapter.addFragment(new ScoreLevel8(),"Level8");
-        adapter.addFragment(new ScoreLevel9(),"Level9");
-        adapter.addFragment(new ScoreLevel10(),"Level10");
-        adapter.addFragment(new ScoreLevel11(),"Level11");
-        adapter.addFragment(new Overall(),"Overall");
-        adapter.addFragment(new ScoreSprint(),"Sprint Mode");*/
         viewPager.setAdapter(adapter);
     }
     @Override

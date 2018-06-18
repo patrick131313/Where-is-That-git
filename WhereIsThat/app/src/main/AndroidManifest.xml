@@ -36,6 +36,7 @@
 
         <activity
             android:name=".StartActivity"
+            android:screenOrientation="portrait"
             android:label="Where is this?">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,13 +45,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".selectlevel.SelectLevelActivity"
-            android:label="Select Level"/>
+            android:label="Select Level"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginActivity"
-            android:label="Login" />
+            android:label="Login"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".login.MainActivity"
             android:label="@string/title_activity_main"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".login.LoginActivity"
             android:screenOrientation="portrait"
@@ -58,21 +62,26 @@
             />
         <activity android:name=".register.RegisterActivity"
             android:label="Register"
+            android:screenOrientation="portrait"
             />
         <activity
             android:name=".level.LevelActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_level"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity android:name=".scores.ScoresActivity"
+            android:screenOrientation="portrait"
             android:label="Highscores"/>
         <activity
             android:name=".sprint.SprintActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_sprint"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity android:name=".settings.SettingsActivity"
-            android:label="Settings"></activity>
+            android:label="Settings"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

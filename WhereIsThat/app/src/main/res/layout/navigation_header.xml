@@ -20,6 +20,6 @@
         android:layout_height="wrap_content"
 
         android:layout_gravity="bottom|center_horizontal"
-        android:text="Where is that?"/>
+        android:text="Where is this?"/>
 
 </FrameLayout>

@@ -35,7 +35,6 @@ public class GetScores {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Log.i("Snapshot", "onDataChange: "+dataSnapshot.toString());
                 int total = (int) dataSnapshot.getChildrenCount();
                 Log.i("Snapshot", "onDataChange:"+String.valueOf(total));
                 for(DataSnapshot snapshot:dataSnapshot.getChildren())
@@ -43,13 +42,7 @@ public class GetScores {
 
                     Log.i("Snapshot",snapshot.toString());
                     ScoresRank score=new ScoresRank(snapshot.child("user").getValue().toString(),snapshot.child("scores/"+level).getValue().toString(),0);
-                    ///     if(score.getUser().equals("patrick1313"))
-
-
-
                     scoreList.add(score);
-
-
                     Log.i("Snapshot",snapshot.child("scores/"+level).getValue().toString());
                     Log.i("Snapshot",snapshot.child("user").getValue().toString());
                     Log.i("ScoreList",scoreList.toString());
@@ -70,30 +63,25 @@ public class GetScores {
                         if(username.equals(rank.getUser()) && username!="") {
                             found=true;
                             scoresRank=new ScoresRank(rank.getUser(),rank.getScore(),mLastPosition);
-                      //      finalList.add(rank);
-                          Log.i("Adaugat", "onDataChange: "+username);
+                            Log.i("Adaugat", "onDataChange: "+username);
                         }
-                       // finalList.get(i).setUser(String.valueOf(mLastPosition)+"."+rank.getUser());
+
                         finalList.get(i).setPosition(mLastPosition);
                         i++;
-
                     }
                     else
                     {
                         Log.i("ForRank", "onDataChange: "+String.valueOf(i));
 
                         if(username.equals(rank.getUser()) && username!="") {
-                          //  finalList.add(rank);
                             found=true;
                             scoresRank=new ScoresRank(rank.getUser(),rank.getScore(),i+1);
                             Log.i("Adaugat", "onDataChange: "+username);
                         }
                         mLastPosition=i+1;
                         mLastScore=rank.getScore();
-                       // finalList.get(i).setUser(String.valueOf(i+1)+"."+rank.getUser());
                         finalList.get(i).setPosition(i+1);
                         i++;
-
                     }
 
                 }
@@ -149,10 +137,9 @@ public class GetScores {
                         if(username.equals(rank.getUser()) && username!="") {
                             found=true;
                             scoresRank=new ScoresRank(rank.getUser(),rank.getScore(),mLastPosition);
-                            //      finalList.add(rank);
                             Log.i("Adaugat", "onDataChange: "+username);
                         }
-                       // finalList.get(i).setUser(String.valueOf(mLastPosition)+"."+rank.getUser());
+
                         finalList.get(i).setPosition(mLastPosition);
                         i++;
                     }
@@ -161,14 +148,12 @@ public class GetScores {
                         Log.i("ForRank", "onDataChange: "+String.valueOf(i));
 
                         if(username.equals(rank.getUser()) && username!="") {
-                            //  finalList.add(rank);
                             found=true;
                             scoresRank=new ScoresRank(rank.getUser(),rank.getScore(),i+1);
                             Log.i("Adaugat", "onDataChange: "+username);
                         }
                         mLastPosition=i+1;
                         mLastScore=rank.getScore();
-                      //  finalList.get(i).setUser(String.valueOf(i+1)+"."+rank.getUser());
                         finalList.get(i).setPosition(i+1);
                         i++;
                     }

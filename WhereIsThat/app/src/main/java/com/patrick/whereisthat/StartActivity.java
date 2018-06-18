@@ -77,7 +77,7 @@ public class StartActivity extends FragmentActivity {
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(),"You must be logged to play",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"You must be logged in to play, swipe left to login",Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -102,7 +102,7 @@ public class StartActivity extends FragmentActivity {
         }
         else
         {
-            Toast.makeText(getApplicationContext(),"You must be logged to play",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"You must be logged in to play, swipe left to login",Toast.LENGTH_LONG).show();
         }
     }
     public void setUpNavDrawer()
@@ -129,11 +129,14 @@ public class StartActivity extends FragmentActivity {
                         break;
                         case R.id.invite_navigation_menu_item:
                             Intent sendIntent = new Intent();
+                            String Title = "Share";
+                            Intent chooser = Intent.createChooser(sendIntent, Title);
                             sendIntent.setAction(Intent.ACTION_SEND);
-                            sendIntent.putExtra(Intent.EXTRA_SUBJECT,"Where is this game");
-                            sendIntent.putExtra(Intent.EXTRA_TEXT, "Hi,you must try this game! #whereisthis"+System.getProperty("line.separator")+"www.whereisthis.com");
+                            sendIntent.putExtra(Intent.EXTRA_SUBJECT," 'Where is this?' - game");
+                            sendIntent.putExtra(Intent.EXTRA_TEXT, "Hi, you must try this game! #whereisthis"+System.getProperty("line.separator")+"www.whereisthisapp.com");
                             sendIntent.setType("text/plain");
-                            startActivity(sendIntent);
+                            if (sendIntent.resolveActivity(getPackageManager()) != null)
+                                startActivity(chooser);
                         break;
                     case R.id.settings_navigation_menu_item:
                         Intent intent3=new Intent(getApplicationContext(),SettingsActivity.class);
