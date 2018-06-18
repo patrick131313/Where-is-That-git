@@ -72,8 +72,8 @@ public class StartActivity extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 if(!mUser.equals("")) {
-                        Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
-                        startActivity(intent);
+                    Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
+                    startActivity(intent);
                 }
                 else
                 {
@@ -118,57 +118,57 @@ public class StartActivity extends FragmentActivity {
     {
 
         navigationView.setNavigationItemSelectedListener(
-        new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.leaderboard_navigation_menu_item:
-                        Intent intent2=new Intent(getApplicationContext(), ScoresActivity.class);
-                        intent2.putExtra(EXTRA_USERNAME,mUser);
-                        startActivity(intent2);
-                        break;
-                        case R.id.invite_navigation_menu_item:
-                            Intent sendIntent = new Intent();
-                            String Title = "Share";
-                            Intent chooser = Intent.createChooser(sendIntent, Title);
-                            sendIntent.setAction(Intent.ACTION_SEND);
-                            sendIntent.putExtra(Intent.EXTRA_SUBJECT," 'Where is this?' - game");
-                            sendIntent.putExtra(Intent.EXTRA_TEXT, "Hi, you must try this game! #whereisthis"+System.getProperty("line.separator")+"www.whereisthisapp.com");
-                            sendIntent.setType("text/plain");
-                            if (sendIntent.resolveActivity(getPackageManager()) != null)
-                                startActivity(chooser);
-                        break;
-                    case R.id.settings_navigation_menu_item:
-                        Intent intent3=new Intent(getApplicationContext(),SettingsActivity.class);
-                        startActivity(intent3);
-                        break;
-                    case R.id.logout_navigation_menu_item:
-                       String title=item.getTitle().toString();
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.leaderboard_navigation_menu_item:
+                                Intent intent2=new Intent(getApplicationContext(), ScoresActivity.class);
+                                intent2.putExtra(EXTRA_USERNAME,mUser);
+                                startActivity(intent2);
+                                break;
+                            case R.id.invite_navigation_menu_item:
+                                Intent sendIntent = new Intent();
+                                String Title = "Share";
+                                Intent chooser = Intent.createChooser(sendIntent, Title);
+                                sendIntent.setAction(Intent.ACTION_SEND);
+                                sendIntent.putExtra(Intent.EXTRA_SUBJECT," 'Where is this?' - game");
+                                sendIntent.putExtra(Intent.EXTRA_TEXT, "Hi, you must try this game! #whereisthis"+System.getProperty("line.separator")+"www.whereisthisapp.com");
+                                sendIntent.setType("text/plain");
+                                if (sendIntent.resolveActivity(getPackageManager()) != null)
+                                    startActivity(chooser);
+                                break;
+                            case R.id.settings_navigation_menu_item:
+                                Intent intent3=new Intent(getApplicationContext(),SettingsActivity.class);
+                                startActivity(intent3);
+                                break;
+                            case R.id.logout_navigation_menu_item:
+                                String title=item.getTitle().toString();
 
-                        if(title.equals("Logout"))
-                        {
-                            FirebaseAuth.getInstance().signOut();
-                            logoutToast();
-                            changeMenuToLogout();
-                            deleteUsername();
+                                if(title.equals("Logout"))
+                                {
+                                    FirebaseAuth.getInstance().signOut();
+                                    logoutToast();
+                                    changeMenuToLogout();
+                                    deleteUsername();
 
+                                }
+                                else {
+                                    Log.d("Logout", "Logout clicked");
+                                    Intent intent = new Intent(getApplication(), LoginActivity.class);
+                                    startActivity(intent);
+                                    break;
+                                }
+
+
+                            default:
+                                break;
                         }
-                        else {
-                            Log.d("Logout", "Logout clicked");
-                            Intent intent = new Intent(getApplication(), LoginActivity.class);
-                            startActivity(intent);
-                            break;
-                        }
 
+                        return true;
+                    }
 
-                    default:
-                    break;
-                }
-
-                return true;
-            }
-
-        });
+                });
 
     };
 

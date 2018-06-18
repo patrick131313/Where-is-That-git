@@ -1,5 +1,6 @@
 package com.patrick.whereisthat.scores;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,8 @@ public class ScoreLevel11 extends Fragment {
     LinearLayoutManager mLayoutManager;
     String mUser;
     SwipeRefreshLayout mRefreshLayout;
+    Context mContext;
+    View view;
 
     public ScoreLevel11()
     {
@@ -50,6 +53,8 @@ public class ScoreLevel11 extends Fragment {
                 mRefreshLayout.setRefreshing(false);
             }
         });
+        view=ScoreLevel11;
+        TransferView(view);
         return ScoreLevel11;
     }
 
@@ -57,9 +62,13 @@ public class ScoreLevel11 extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
-        mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
+        mRecylerViewAdapter=new RecyclerViewAdapter(mUser,getContext());
         mRecylerViewAdapter.TransferAdapter(mRecylerViewAdapter);
 
         GetScores.getScoresLevel("level11",mRecylerViewAdapter,mUser);
+    }
+    public void TransferView(View view)
+    {
+        mRecylerViewAdapter.TransferView(view);
     }
 }

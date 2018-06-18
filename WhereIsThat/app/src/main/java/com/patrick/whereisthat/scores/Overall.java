@@ -1,5 +1,6 @@
 package com.patrick.whereisthat.scores;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,8 @@ public class Overall extends Fragment {
     LinearLayoutManager mLayoutManager;
     String mUser;
     SwipeRefreshLayout mRefreshLayout;
+    Context mContext;
+    View view;
 
 
     public Overall()
@@ -55,6 +58,8 @@ public class Overall extends Fragment {
                 mRefreshLayout.setRefreshing(false);
             }
         });
+        view=Overall;
+        TransferView(view);
         return Overall;
     }
 
@@ -62,18 +67,17 @@ public class Overall extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
-        mRecylerViewAdapter=new RecyclerViewAdapter(mUser);
+        mRecylerViewAdapter=new RecyclerViewAdapter(mUser,getContext());
         mRecylerViewAdapter.TransferAdapter(mRecylerViewAdapter);
         GetScores.getScoresLevel("overall",mRecylerViewAdapter,mUser);
-        // getScoresLevel("level3");
-//        scoreListLevel1=GetScores.getScoresLevel("level1");
-        //    scoreListLevel1.add(new ScoresRank("aaaa","111"));
-        //      Log.i("OnCreateScoreList", scoreListLevel1.toString());
-        //    mRecylerViewAdapter=new RecyclerViewAdapter(scoreListLevel1);
+
         Log.i("ScoreLevel1", "onCreate: ");
-        //  new ScoresAsync().execute();
 
 
+    }
+    public void TransferView(View view)
+    {
+        mRecylerViewAdapter.TransferView(view);
     }
 
 
@@ -84,7 +88,9 @@ public class Overall extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
+
         super.onDestroy();
     }
 }

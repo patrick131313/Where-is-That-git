@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,20 +38,36 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private SearchView searchView;
     private RecyclerViewAdapter mAdapter;
     private ScoresRank userLogged;
+    private Context mContext;
+    private ProgressBar bar;
+    private View mView=null;
     public RecyclerViewAdapter(){
 
     }
 
-    public RecyclerViewAdapter(String Username)
+    public RecyclerViewAdapter(String Username,Context mContext)
     {
         this.Username=Username;
+        this.mContext=mContext;
+    }
 
-
+    public void MakeToast()
+    {
+        Toast.makeText(mContext,"No user found",Toast.LENGTH_LONG).show();
     }
     public void TransferAdapter(RecyclerViewAdapter mAdapter)
     {
         this.mAdapter=mAdapter;
     }
+    public void TransferView(View mView)
+    {
+        this.mView=mView;
+        if(this.mView==null)
+            Log.i("ViewTest", "Null");
+        else
+            Log.i("ViewTest", "Not null");
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
@@ -106,7 +123,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 holder.mUser.setText(Html.fromHtml("Logged user:"+"<b>"+mArray.get(mArray.size() - 1).getUser().toString()+"</b>"));
                 holder.mScore.setText(Html.fromHtml("Points:" + "<b>"+mArray.get(mArray.size() - 1).getScore().toString()+"</b>"));
                 holder.mPosition.setText(Html.fromHtml("Rank:" +"<b>"+ String.valueOf(mArray.get(mArray.size() - 1).getPosition())+"</b>"));
-
             }
 
 
@@ -117,7 +133,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.mArrayFiltered=ranks;
         this.mArray=ranks;
         Log.i("ArraySize", String.valueOf(mArray.size()));
-
+       // bar.setVisibility(View.INVISIBLE);
+        if(mView!=null)
+        {
+            ProgressBar bar=mView.findViewById(R.id.rw_bar);
+            bar.setVisibility(View.INVISIBLE);
+        }
         this.notifyDataSetChanged();
 
     }
@@ -183,10 +204,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
                 }
                 Log.i("Filter", "----------");
+               if(mArrayFiltered.size()!=0)
                 notifyDataSetChanged();
+               else {
+                   mArrayFiltered=mArray;
+                   notifyDataSetChanged();
+                   MakeToast();
+               }
+
             }
         };
     }
+
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -201,5 +231,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mScore = itemView.findViewById(R.id.text_view_score);
             mPosition=itemView.findViewById(R.id.text_view_position);
         }
+
     }
 }

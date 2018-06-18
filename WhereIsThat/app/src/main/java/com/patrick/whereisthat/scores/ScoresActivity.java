@@ -101,4 +101,10 @@ public class ScoresActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void makeToast()
+    {
+        Toast.makeText(getApplicationContext(),"No user found",Toast.LENGTH_LONG).show();
+    }
+
 }
