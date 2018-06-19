@@ -1,6 +1,7 @@
 package com.patrick.whereisthat.register;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.StartActivity;
 import com.patrick.whereisthat.login.LoginActivity;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -73,44 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
         mCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean register=true;
-                final String email = mEmail.getText().toString();
-                final String user = mUsername.getText().toString();
-                final String password = mPassword.getText().toString();
-                final String rpassword=mRPassword.getText().toString();
-                Log.d("Email:", email.toString());
-                Log.d("Password:", password.toString());
-                if(email.equals("") || user.equals("")||(password.equals("")||rpassword.equals("")))
-                 {
-                     Toast.makeText(getApplicationContext(), "You must complete all fields", Toast.LENGTH_LONG).show();
-                     register = false;
-                }
-                else
-                {
-                    if (!isEmailValid(email))
-                    {
-                        Toast.makeText(getApplicationContext(), "Email adress is not valid", Toast.LENGTH_LONG).show();
-                        register = false;
-                    }
-                    else
-                    {
-                        if((!rpassword.equals(password)))
-                        {
-                            Toast.makeText(getApplicationContext(), "Passwords don't match", Toast.LENGTH_LONG).show();
-                            register = false;
-                        }
-                        if(password.length()<6)
-                        {
-                            Toast.makeText(getApplicationContext(), "Password is too short, must have minimum 6 characters", Toast.LENGTH_LONG).show();
-                            register = false;
-                        }
-                    }
-                }
-                if(register==true)
-                checkIfUserExists(email,user,password);
-
-
-
+                new CheckInternetTask().execute();
             }
         });
 
@@ -222,6 +187,75 @@ public class RegisterActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            //You can replace it with your name
+            Log.i("CheckConnection", ipAddr.toString());
+            return !ipAddr.equals("");
+
+        } catch (Exception e) {
+            Log.i("CheckConnection", e.toString());
+            return false;
+        }
+    }
+    class CheckInternetTask extends AsyncTask<Void, Void, Boolean>
+    {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return isInternetAvailable();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            //   super.onPostExecute(aBoolean);
+            if(aBoolean)
+            {
+                boolean register=true;
+                final String email = mEmail.getText().toString();
+                final String user = mUsername.getText().toString();
+                final String password = mPassword.getText().toString();
+                final String rpassword=mRPassword.getText().toString();
+                Log.d("Email:", email.toString());
+                Log.d("Password:", password.toString());
+                if(email.equals("") || user.equals("")||(password.equals("")||rpassword.equals("")))
+                {
+                    Toast.makeText(getApplicationContext(), "You must complete all fields", Toast.LENGTH_LONG).show();
+                    register = false;
+                }
+                else
+                {
+                    if (!isEmailValid(email))
+                    {
+                        Toast.makeText(getApplicationContext(), "Email adress is not valid", Toast.LENGTH_LONG).show();
+                        register = false;
+                    }
+                    else
+                    {
+                        if((!rpassword.equals(password)))
+                        {
+                            Toast.makeText(getApplicationContext(), "Passwords didn't match", Toast.LENGTH_LONG).show();
+                            register = false;
+                        }
+                        else {
+                            if (password.length() < 6) {
+                                Toast.makeText(getApplicationContext(), "Password is too short, must have minimum 6 characters", Toast.LENGTH_LONG).show();
+                                register = false;
+                            }
+                        }
+                    }
+                }
+                if(register==true)
+                    checkIfUserExists(email,user,password);
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(),"Check your internet connection",Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
 

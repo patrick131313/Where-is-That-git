@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +33,9 @@ public class Overall extends Fragment {
     SwipeRefreshLayout mRefreshLayout;
     Context mContext;
     View view;
+    int counter=0;
+    ProgressBar bar;
+
 
 
     public Overall()
@@ -43,6 +47,12 @@ public class Overall extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View Overall=inflater.inflate(R.layout.scores_rv,container,false);
+        counter++;
+        bar=Overall.findViewById(R.id.rw_bar);
+        if(counter>1)
+        {
+            bar.setVisibility(View.INVISIBLE);
+        }
         mRefreshLayout=Overall.findViewById(R.id.swipeRefresh);
         mLayoutManager=new LinearLayoutManager(getContext());
         mRecyclerView=Overall.findViewById(R.id.rw_scores);

@@ -1,6 +1,7 @@
 package com.patrick.whereisthat.dialog;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,9 +16,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.patrick.whereisthat.R;
 
+import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,24 +48,8 @@ public class DialogResetPassword extends DialogFragment {
         confirmDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isEmpty(mEmail.getText().toString()))
-                {
-                    Toast.makeText(mContext, "You must enter your email adress",
-                            Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    if (!isEmailValid(mEmail.getText().toString())) {
-                        Toast.makeText(mContext, "Email adress is not valid", Toast.LENGTH_LONG).show();
 
-                    }
-                }
-                if(!isEmpty(mEmail.getText().toString()) && isEmailValid(mEmail.getText().toString()) ){
-                    Log.d(TAG, "onClick: attempting to send reset link to: " + mEmail.getText().toString());
-                    sendPasswordResetEmail(mEmail.getText().toString());
-                    getDialog().dismiss();
-                }
-
+                new CheckInternetTask().execute();
             }
         });
         cancelDialog.setOnClickListener(new View.OnClickListener() {
@@ -101,5 +88,56 @@ public class DialogResetPassword extends DialogFragment {
     private boolean isEmailValid(String email) {
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
         return matcher.find();
+    }
+
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            //You can replace it with your name
+            Log.i("CheckConnection", ipAddr.toString());
+            return !ipAddr.equals("");
+
+        } catch (Exception e) {
+            Log.i("CheckConnection", e.toString());
+            return false;
+        }
+    }
+
+    class CheckInternetTask extends AsyncTask<Void, Void, Boolean>
+    {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return isInternetAvailable();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            //   super.onPostExecute(aBoolean);
+            if(aBoolean)
+            {
+                if(isEmpty(mEmail.getText().toString()))
+                {
+                    Toast.makeText(mContext, "You must enter your email adress",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    if (!isEmailValid(mEmail.getText().toString())) {
+                        Toast.makeText(mContext, "Email adress is not valid", Toast.LENGTH_LONG).show();
+
+                    }
+                }
+                if(!isEmpty(mEmail.getText().toString()) && isEmailValid(mEmail.getText().toString()) ){
+                    Log.d(TAG, "onClick: attempting to send reset link to: " + mEmail.getText().toString());
+                    sendPasswordResetEmail(mEmail.getText().toString());
+                    getDialog().dismiss();
+                }
+            }
+            else
+            {
+                Toast.makeText(mContext,"Check your internet connection",Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

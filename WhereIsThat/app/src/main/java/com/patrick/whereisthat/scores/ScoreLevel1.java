@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -47,7 +48,8 @@ public class ScoreLevel1 extends Fragment {
     SwipeRefreshLayout mRefreshLayout;
     Context mContext;
     View view;
-
+    ProgressBar bar;
+    int counter=0;
     public ScoreLevel1()
     {
 
@@ -58,6 +60,12 @@ public class ScoreLevel1 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View ScoreLevel1=inflater.inflate(R.layout.scores_rv,container,false);
+        counter++;
+        bar=ScoreLevel1.findViewById(R.id.rw_bar);
+        if(counter>1)
+        {
+            bar.setVisibility(View.INVISIBLE);
+        }
         mRefreshLayout=ScoreLevel1.findViewById(R.id.swipeRefresh);
         mLayoutManager=new LinearLayoutManager(getContext());
         mRecyclerView=ScoreLevel1.findViewById(R.id.rw_scores);
@@ -83,8 +91,6 @@ public class ScoreLevel1 extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUser=getArguments().getString("Username");
-
-
         mRecylerViewAdapter=new RecyclerViewAdapter(mUser,getContext());
         mRecylerViewAdapter.TransferAdapter(mRecylerViewAdapter);
 
@@ -92,6 +98,12 @@ public class ScoreLevel1 extends Fragment {
         Log.i("ScoreLevel1", "onCreate: ");
 
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+       // bar.setVisibility(View.INVISIBLE);
     }
 
     public void TransferView(View view)

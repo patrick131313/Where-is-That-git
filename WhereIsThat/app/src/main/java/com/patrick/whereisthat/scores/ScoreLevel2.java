@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.patrick.whereisthat.R;
 import com.patrick.whereisthat.data.GetScores;
@@ -29,6 +30,8 @@ public class ScoreLevel2 extends android.support.v4.app.Fragment {
     SwipeRefreshLayout mRefreshLayout;
     Context mContext;
     View view;
+    int counter=0;
+    ProgressBar bar;
 
     public ScoreLevel2()
     {
@@ -39,6 +42,12 @@ public class ScoreLevel2 extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View ScoreLevel2=inflater.inflate(R.layout.scores_rv,container,false);
+        counter++;
+        bar=ScoreLevel2.findViewById(R.id.rw_bar);
+        if(counter>1)
+        {
+            bar.setVisibility(View.INVISIBLE);
+        }
         mRefreshLayout=ScoreLevel2.findViewById(R.id.swipeRefresh);
         mLayoutManager=new LinearLayoutManager(getContext());
       //  mLayoutManager.setReverseLayout(true);

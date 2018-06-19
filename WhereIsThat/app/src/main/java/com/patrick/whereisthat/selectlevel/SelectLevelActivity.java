@@ -3,6 +3,7 @@ package com.patrick.whereisthat.selectlevel;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -30,6 +31,7 @@ import com.patrick.whereisthat.data.FirebaseScores;
 import com.patrick.whereisthat.data.Scores;
 import com.patrick.whereisthat.level.LevelActivity;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +50,8 @@ public class SelectLevelActivity extends AppCompatActivity {
     private int mLastPlayed;
     private long prevLevel;
     private boolean empty;
+    private boolean checked;
+    private boolean mInternet;
 
     private String []mArrayLevels={"Level 1","Level 2","Level 3","Level 4","Level 5","Level 6",
             "Level 7","Level 8","Level 9","Level 10","Level 11"};
@@ -55,7 +59,7 @@ public class SelectLevelActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            getScores();
+        getScores();
         Log.d("Map",mHighscores.toString());
         setContentView(R.layout.activity_select_level);
         android.support.v7.app.ActionBar actionBar=this.getSupportActionBar();
@@ -87,7 +91,7 @@ public class SelectLevelActivity extends AppCompatActivity {
 
     public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-        
+
         private String[] mArrayLevels;
         private Map<String,Long> mHigscores;
         private Context mContext;
@@ -95,7 +99,7 @@ public class SelectLevelActivity extends AppCompatActivity {
         {
             this.mHigscores=mHighscores;
             this.mArrayLevels=mArrayLevels;
-          
+
             this.mContext=mContext;
             Log.d("RecyclerView", "created");
         }
@@ -118,8 +122,8 @@ public class SelectLevelActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
             int level=position+1;
-                Log.i("Imagechanged",  String.valueOf(position));
-                holder.mImageView.setImageResource(getResources().getIdentifier("ic_"+String.valueOf(level), "drawable", getPackageName()));
+            Log.i("Imagechanged",  String.valueOf(position));
+            holder.mImageView.setImageResource(getResources().getIdentifier("ic_"+String.valueOf(level), "drawable", getPackageName()));
 
             holder.mLevel.setText(mArrayLevels[position]);
             if(mHigscores.isEmpty())
@@ -143,25 +147,35 @@ public class SelectLevelActivity extends AppCompatActivity {
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                       // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
-                       Object prev = mHighscores.get("level" + String.valueOf(position));
-                        if(position+1<=mLastPlayed)
+                        checked=false;
+                        new CheckInternetTask().execute();
+                        Object prev = mHighscores.get("level" + String.valueOf(position));
+                        while (!checked)
                         {
-                            Intent intent = new Intent(getApplicationContext(), LevelActivity.class);
-                            intent.putExtra(EXTRA_LEVEL_KEY, String.valueOf(position + 1));
-                            intent.putExtra(EXTRA_HIGHSCORE_KEY, score.toString());
-                            intent.putExtra(EXTRA_OVERALL_KEY, mHighscores.get("overall").toString());
-                            startActivity(intent);
+                            Log.i("Checcked", String.valueOf(checked));
+                        }
+                        Log.i("Checcked", String.valueOf(checked));
+                        // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
+                        if(mInternet) {
+                            if (position + 1 <= mLastPlayed) {
+                                Intent intent = new Intent(getApplicationContext(), LevelActivity.class);
+                                intent.putExtra(EXTRA_LEVEL_KEY, String.valueOf(position + 1));
+                                intent.putExtra(EXTRA_HIGHSCORE_KEY, score.toString());
+                                intent.putExtra(EXTRA_OVERALL_KEY, mHighscores.get("overall").toString());
+                                startActivity(intent);
+                            } else {
+                                if (mLastPlayed != 0)
+                                    Toast.makeText(getApplicationContext(), "You can't play this level now,complete level " + String.valueOf(mLastPlayed)
+                                            , Toast.LENGTH_LONG).show();
+                                else
+                                    Toast.makeText(getApplicationContext(), "You can't play this level now"
+                                            , Toast.LENGTH_LONG).show();
+
+                            }
                         }
                         else
                         {
-                            if(mLastPlayed!=0)
-                            Toast.makeText(getApplicationContext(),"You can't play this level now,complete level " +String.valueOf(mLastPlayed)
-                                    ,Toast.LENGTH_LONG).show();
-                            else
-                                Toast.makeText(getApplicationContext(),"You can't play this level now"
-                                        ,Toast.LENGTH_LONG).show();
-
+                            Toast.makeText(getApplicationContext(),"Check your internet connection",Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -180,11 +194,11 @@ public class SelectLevelActivity extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-          public ImageView mImageView;
-          public TextView mLevel;
-          public TextView mHighscore;
-          public RelativeLayout mLevelItem;
-          public ProgressBar mProgress;
+            public ImageView mImageView;
+            public TextView mLevel;
+            public TextView mHighscore;
+            public RelativeLayout mLevelItem;
+            public ProgressBar mProgress;
 
             public ViewHolder(View itemView) {
                 super(itemView);
@@ -207,8 +221,8 @@ public class SelectLevelActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String string="level3";
-               mHighscores=dataSnapshot.getValue(FirebaseScores.class).getScores();
-               mAdapter.ReplaceData(mHighscores);
+                mHighscores=dataSnapshot.getValue(FirebaseScores.class).getScores();
+                mAdapter.ReplaceData(mHighscores);
 
             }
 
@@ -217,6 +231,32 @@ public class SelectLevelActivity extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            //You can replace it with your name
+            Log.i("CheckConnection", ipAddr.toString());
+            return !ipAddr.equals("");
+
+        } catch (Exception e) {
+            Log.i("CheckConnection", e.toString());
+            return false;
+        }
+    }
+
+    class CheckInternetTask extends AsyncTask<Void, Void, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+           mInternet=isInternetAvailable();
+           checked=true;
+           return null;
+        }
+
 
     }
 

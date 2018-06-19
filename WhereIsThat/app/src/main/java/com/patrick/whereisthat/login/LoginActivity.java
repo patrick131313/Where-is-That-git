@@ -1,6 +1,7 @@
 package com.patrick.whereisthat.login;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.patrick.whereisthat.StartActivity;
 import com.patrick.whereisthat.dialog.DialogResetPassword;
 import com.patrick.whereisthat.register.RegisterActivity;
 
+import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView resetPassword;
     private Button mRegister;
     private Boolean login = true;
+    private boolean clickedOne=false;
+
 
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -68,30 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                login = true;
-                String email = mEmail.getText().toString();
-                String password = mPassword.getText().toString();
-                if (email.equals("") || password.equals("")) {
-                    fieldToast();
-                    login = false;
-                } else {
-                    if (!isEmailValid(email)) {
-                      emailToast();
-                        login = false;
-                    }
-                }
-                if (login == true) {
-                    mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                loginToast();
-                            } else {
-                                errorToast();
-                            }
-                        }
-                    });
-                }
+                new CheckInternetTask().execute();
             }
         });
 
@@ -118,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void loginToast() {
-        Toast.makeText(this, "You are logged in", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "You are logged in", Toast.LENGTH_SHORT).show();
     }
 
     public void errorToast() {
@@ -161,5 +142,63 @@ public class LoginActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            //You can replace it with your name
+            Log.i("CheckConnection", ipAddr.toString());
+            return !ipAddr.equals("");
+
+        } catch (Exception e) {
+            Log.i("CheckConnection", e.toString());
+            return false;
+        }
+    }
+
+    class CheckInternetTask extends AsyncTask<Void, Void, Boolean>
+    {
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return isInternetAvailable();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+         //   super.onPostExecute(aBoolean);
+            if(aBoolean)
+            {
+                login = true;
+                String email = mEmail.getText().toString();
+                String password = mPassword.getText().toString();
+                if (email.equals("") || password.equals("")) {
+                    fieldToast();
+                    login = false;
+                } else {
+                    if (!isEmailValid(email)) {
+                        emailToast();
+                        login = false;
+                    }
+                }
+                if (login == true) {
+                    mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                loginToast();
+                            } else {
+                                errorToast();
+                            }
+                        }
+                    });
+                }
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(),"Check your internet connection",Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
