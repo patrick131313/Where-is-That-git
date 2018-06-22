@@ -95,6 +95,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private MaterialDialog dialogCity;
     private boolean clickedOne=false;
     private float markerColor;
+    private boolean firstTime=true;
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -239,6 +240,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             public void onFinish() {
 
                 Log.i("OnFinish", "Game finished");
+                Log.i("Score", "On finish"+String.valueOf(mScore));
                 CheckScore();
                 mBinding.textViewCountdown.setText("Time: 00:00");
                 isFinished=true;
@@ -296,23 +298,24 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     public void CheckScore()
     {
         String key = FirebaseAuth.getInstance().getUid();
-
+        Log.i("Score", "CheckScore"+String.valueOf(mScore));
         final DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("users").child(key).child("sprint_mode");
-        myRef.addValueEventListener(new ValueEventListener() {
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i("CheckScore", "onDataChange: "+dataSnapshot.getValue().toString());
-                String  current_score=dataSnapshot.getValue().toString();
-                if(Long.parseLong(current_score)<mScore)
-                {
-                    myRef.setValue(mScore);
-                    Toast.makeText(getApplicationContext(), "You've beat your sprint mode record, now your highscore is "+mScore+" points!", Toast.LENGTH_SHORT).show();
+                if (firstTime) {
+                    Log.i("Score", "OnDataChange" + String.valueOf(mScore));
+                    Log.i("CheckScore", "onDataChange record: " + dataSnapshot.getValue().toString());
+                    String current_score = dataSnapshot.getValue().toString();
+                    if (Long.parseLong(current_score) < mScore) {
+                        myRef.setValue(mScore);
+                        Toast.makeText(getApplicationContext(), "You've beat your sprint mode record, now your highscore is " + mScore + " points!", Toast.LENGTH_SHORT).show();
 
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(),"You've finished sprint mode with "+ mScore+" points!",Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You've finished sprint mode with " + mScore + " points!", Toast.LENGTH_LONG).show();
 
+                    }
+                    firstTime=false;
                 }
             }
 
@@ -726,7 +729,9 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             if(counter==20)
             {
                 mCountDownTimer.cancel();
+                Log.i("Score", "Before"+String.valueOf(mScore));
                 mScore=mScore+mTimeRemaining/10;
+                Log.i("Score", "After"+String.valueOf(mScore));
                 mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
                 mCountDownTimer.onFinish();
                 mMap.clear();
