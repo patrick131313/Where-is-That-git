@@ -42,9 +42,9 @@ public class Values {
         levelList.add(new Level("3","federation_tower","55.749693","37.537539","–","Is currently the tallest completed skyscraper in Europe."));
         levelList.add(new Level("3","sapphire_tower","41.085083","29.006454", "–","Was the fourth tallest building in Europe when its construction was completed in 2010."));
         levelList.add(new Level("3","sky_tower","51.094519","17.019570","–","Is the tallest building in Poland."));
-        levelList.add(new Level("3","socar_tower","40.405512","49.883653","–","Is the tallest building in the Caucasus region."));
+        levelList.add(new Level("3","spire","52.232258","20.984269","–","Is the second tallest building in Poland."));
         levelList.add(new Level("3","the_shard","51.504500","-0.086500","–","The fifth tallest building in Europe."));
-        levelList.add(new Level("3","torre_cristal","40.478268","-3.686876","–","Is the tallest building and structure in Spain and the fourth in the European Union."));
+        levelList.add(new Level("3","folkart","38.454187","27.176769","–","Are twin skyscrapers in the Bayraklı district."));
         levelList.add(new Level("3","unicredit","45.483585","9.190051","–","Is the tallest building in Italy."));
 
         levelList.add(new Level("4","antwerpen","51.219448","4.402464","Antwerpen","It is Europe’s second-largest seaport, after Rotterdam."));

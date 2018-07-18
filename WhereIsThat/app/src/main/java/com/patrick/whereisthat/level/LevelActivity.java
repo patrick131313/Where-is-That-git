@@ -300,37 +300,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             Toast.makeText(this,"You must close the image to put marker on map",Toast.LENGTH_LONG).show();
         }
     }
-    public void getCity()
-    {
-        Geocoder geocoder;
-        LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()),Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
-        List<Address> adresses;
-        geocoder = new Geocoder(this);
-        try {
-            adresses = geocoder.getFromLocation(mLatLng.latitude, mLatLng.longitude, 1);
-            if(adresses.isEmpty())
-            {
-                score(dbLatLng,mLatLng);
-            }
-            else {
 
-                String city = adresses.get(0).getLocality();
-                if(city==null)
-                    city="z";
-                Log.i(TAG, "getCity: "+city);
-                Log.i(TAG, "getCity: "+levelList.get(mCurrent-1).getCity());
-                if (city.equals(levelList.get(mCurrent-1).getCity()))
-                    score_city();
-                else {
-                    score(dbLatLng, mLatLng);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("Bundle_error", e.toString());
-            score(dbLatLng, mLatLng);
-        }
-    }
 
 
     public float getDistance(LatLng LatLng1, LatLng LatLng2) {
@@ -358,17 +328,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mScoreRound=Score;
         mScore=mScore+Score;
 
-    }
-    public void score_city()
-    {
-        long Score=5000-(long)(updateTime*0.1);
-        if(hint_pressed)
-            Score=Score-1000;
-        if(Score<0)
-            Score=0;
-        mScoreRound=Score;
-        mScore=mScore+Score;
-        mDistance=0;
     }
     Runnable updateTimerThread = new Runnable() {
         @Override
@@ -438,7 +397,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
                     .allowMainThreadQueries()
                     .build();
             levelDao = db.levelDao();
-           // levelDao.deleteAll();
+            //levelDao.deleteAll();
             if (db.levelDao().lines() == 0) {
                 Values values = new Values();
                 levelList = values.getValues();
@@ -620,32 +579,8 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);
             mMap.setLatLngBoundsForCameraTarget(Europe);
-    //       new VisibleTask().execute();
-
         }
     }
-
-/*    public class VisibleTask extends AsyncTask<Void,Void,Void>
-    {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if(!isFinished) {
-                mBinding.imageViewDb.setVisibility(View.VISIBLE);
-                mBinding.imageViewClose.setVisibility(View.VISIBLE);
-                mBinding.textViewScore.setVisibility(View.VISIBLE);
-                mBinding.textViewTimer.setVisibility(View.VISIBLE);
-                mBinding.buttonHint.setVisibility(View.VISIBLE);
-                StartTimer();
-            }
-        }
-    }*/
     public class ScoreTask extends AsyncTask<Void,Void,Void>
     {
 
@@ -653,7 +588,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
         @Override
         protected Void doInBackground(Void... voids) {
-            getCity();
+          //  getCity();
+            LatLng dbLatLng=new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()),Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
+            score(dbLatLng, mLatLng);
             return null;
         }
 

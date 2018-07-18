@@ -185,12 +185,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mBinding.buttonConfirmSprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTask.getStatus() == AsyncTask.Status.RUNNING) {
-                    mTask.cancel(true);
-                    if (mTask.isCancelled()) {
-                        Log.i("zz", "doInBackground:cancelled ");
-                    }
-                }
 
                 if (clickedOne == false) {
                     if (counter == 20 || isFinished) {
@@ -333,11 +327,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         super.onDestroy();
         mCountDownTimer.cancel();
         Log.i("OnDestroy", "onDestroy:called ");
-      /*  onDestroyCalled=true;
-        mCountDownTimer.onFinish();*/
-        if(mTask.getStatus()==AsyncTask.Status.RUNNING && mTask!=null) {
-            mTask.cancel(false);
-        }
     }
 
     @Override
@@ -436,75 +425,13 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
     }
-    public void score_city()
-    {
 
-        mScore = mScore + 5000;
-        mScoreRound=5000;
-        mDistance=0;
-    }
 
     public Boolean ContainsCyrillic(String s) {
         for (int i = 0; i < s.length(); i++)
             if (Character.UnicodeBlock.of(s.charAt(i)).equals(Character.UnicodeBlock.CYRILLIC))
                 return true;
         return false;
-    }
-    public void getCity()
-    {
-        Log.i("Aa", "getCity: Called");
-        Geocoder geocoder;
-        String city_name;
-        LatLng dbLatLng;//=new LatLng(Double.parseDouble(levelList.get(mCurrent-1).getLatitude()),Double.parseDouble(levelList.get(mCurrent-1).getLongitude()));
-        switch (mCurrent)
-        {
-            case "DB":
-                Log.i("Aa", "getCity:DB called");
-                city_name=sprintList.get(counter).getCity();
-                Log.i("City_name", city_name);
-                dbLatLng=new LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
-                break;
-            case "Random":
-                city_name=mCities.get(counter).getCity();
-                Log.i("City_name", city_name);
-                dbLatLng=new LatLng(Double.parseDouble(mCities.get(counter).getLatitude()),Double.parseDouble(mCities.get(counter).getLongitude()));
-                break;
-            default:
-                dbLatLng=new LatLng(0,0);
-                city_name="";
-                break;
-        }
-
-        List<Address> adresses;
-        geocoder = new Geocoder(this);
-        try {
-            Log.i("Aa", "getCity: From location called");
-            adresses = geocoder.getFromLocation(mLatLng.latitude, mLatLng.longitude, 1);
-            if(adresses.isEmpty())
-            {
-                Log.i("Aa", "getCity: Adresses empty");
-                score(dbLatLng,mLatLng);
-            }
-            else {
-
-                String city = adresses.get(0).getLocality();
-                if(city==null)
-                    city="z";
-                Log.i("Aa", "getCity: "+city);
-                if (city.equals(city_name))
-                    score_city();
-
-                else {
-                    score(dbLatLng, mLatLng);
-
-                    Log.i("Aa", "getCity: Cities not equals");
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("Bundle_error", e.toString());
-
-        }
     }
 
 
@@ -519,7 +446,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     .allowMainThreadQueries()
                     .build();
             sprintDao = db.sprintDao();
-            // levelDao.deleteAll();
             if (db.sprintDao().lines() == 0) {
                 SprintValues values = new SprintValues();
                 sprintList = values.getValues();
@@ -608,119 +534,22 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 default:break;
 
             }
-            // Toast.makeText(this,String.valueOf(test),Toast.LENGTH_SHORT).show();
-            // mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_test));
+
             LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
             mMap.setMinZoomPreference(4.0f);
             mMap.setMaxZoomPreference(7.0f);
             mMap.setLatLngBoundsForCameraTarget(Europe);
-            mTask=new SearchCitiesTask().execute();
+
         }
     }
-  /*  public class DialogFirst extends AsyncTask<Void,Void,Void>
-    {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            DialogCity(sprintList.get(0).getCity());
-        }
-    }*/
-
-    public class SearchCitiesTask extends AsyncTask<Void,Void,List<LatLng>> {
 
 
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            mTask.cancel(true);
-        }
-
-        @Override
-        protected List<LatLng> doInBackground(Void... voids) {
-
-
-            Log.i("zz", "doInBackground: ");
-            while(nr_cities<21) {
-                if(isCancelled())
-                {
-                    Log.i("zz", "doInBackground:Cancelled ");
-                    break;
-
-                }
-                Geocoder geocoder;
-                List<Address> adresses;
-                geocoder = new Geocoder(getApplicationContext());
-                Random r = new Random();
-                Random l = new Random();
-                Random rr = new Random();
-                Random ll = new Random();
-                int lat = r.nextInt(71 - 38) + 38;
-                int lng = l.nextInt(63);
-                lng = lng - 20;
-                double latitude = rr.nextDouble() + lat;
-                double longitude = ll.nextDouble() + lng;
-                LatLng latLng1 = new LatLng(latitude, longitude);
-                try {
-
-                    adresses = geocoder.getFromLocation(latLng1.latitude, latLng1.longitude, 1);
-                    if (!adresses.isEmpty()) {
-
-                        if (adresses.get(0).getLocality() != null && !adresses.get(0).getLocality().contains(" ") && !ContainsCyrillic(adresses.get(0).getLocality()) ) {
-                            Cities cities = new Cities(adresses.get(0).getLocality(), String.valueOf(latLng1.latitude), String.valueOf(latLng1.longitude));
-                            mCities.add(cities);
-                            latLngs.add(latLng1);
-                            nr_cities++;
-                            Log.i("zz", "doInBackground: "+String.valueOf(nr_cities)+":"+String.valueOf(adresses.get(0).getLocality()));
-                        }
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.d("Bundle_error", e.toString());
-                    return null;
-                }
-            }
-
-            return latLngs;
-        }
-
-
-        @Override
-        protected void onPostExecute(List<LatLng> latLngs) {
-            if(isCancelled())
-                return;
-        }
-    }
     public class NextCityTask extends AsyncTask<Void,Void,String> //trecere la orasul urmator
     {
 
         @Override
         protected String doInBackground(Void... voids) {
-            if(counter<20 || !isFinished)
-            {
-                if(mCities.size()-2<counter)
-                {
-
-                    counter++;
-                    mCurrent="DB";
-                    return sprintList.get(counter).getCity();
-                }
-                else {
-                    counter++;
-                    mCurrent="Random";
-                    return mCities.get(counter).getCity();
-
-                }
-
-
-            }
-            return null;
+            return sprintList.get(counter).getCity();
         }
         @Override
         protected void onPostExecute(String s) {
@@ -747,7 +576,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     mBinding.textViewSprint.setVisibility(View.VISIBLE);
                     mBinding.closeCitySprint.setVisibility(View.VISIBLE);
                     mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
-                    mTask = new SearchCitiesTask().execute();
+
             }
         }
     }
@@ -758,7 +587,9 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         @Override
         protected Void doInBackground(Void... voids) {
-            getCity();
+         LatLng dbLatLng=new LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
+         score(dbLatLng,mLatLng);
+         counter++;
             return null;
         }
 
