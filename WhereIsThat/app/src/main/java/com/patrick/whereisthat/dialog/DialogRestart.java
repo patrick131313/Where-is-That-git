@@ -30,15 +30,14 @@ public class DialogRestart extends DialogFragment implements DialogInterface.OnD
         mYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dismiss();
-                ((SprintActivity)getActivity()).mCountDownTimer.cancel();
-                Log.i("OnDestroy", "onDestroy:called ");
-                if(((SprintActivity)getActivity()).mTask.getStatus()== AsyncTask.Status.RUNNING) {
-                    ((SprintActivity)getActivity()).mTask.cancel(false);
-                }
-                ((SprintActivity)getActivity()).finish();
-                Intent intent = new Intent(getContext(), SprintActivity.class);
-                startActivity(intent);
+                Log.i("Crash", "onClick: ");
+
+            //    dismiss();
+                //((SprintActivity)getActivity()).mCountDownTimer.cancel();
+             //   Log.i("OnDestroy", "onDestroy:called ");
+            //    ((SprintActivity)getActivity()).finish();
+            //    Intent intent = new Intent(getContext(), SprintActivity.class);
+            //    startActivity(intent);
             }
         });
         mNo.setOnClickListener(new View.OnClickListener() {

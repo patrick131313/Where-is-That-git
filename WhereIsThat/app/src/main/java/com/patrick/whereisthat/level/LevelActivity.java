@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -53,7 +54,7 @@ import java.util.List;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallback,GoogleMap.OnMapClickListener {
+public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallback,GoogleMap.OnMapClickListener,GoogleMap.OnMarkerDragListener{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -87,6 +88,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     DialogLevel mDialog;
     private boolean clickedOne=false;
     private float markerColor;
+    private MarkerOptions mMarker;
     LatLngBounds Europe;
 
 
@@ -233,6 +235,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         mMap = googleMap;
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMapClickListener(this);
+        mMap.setOnMarkerDragListener(this);
         new MapTask().execute();
 
     }
@@ -281,14 +284,14 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
 
     @Override
     public void onMapClick(LatLng latLng) {
-
-        mMap.clear();
-        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) {
-            mMap.addMarker(new MarkerOptions()
+         mMarker=new MarkerOptions()
                 .position(new LatLng(latLng.latitude, latLng.longitude))
                 .draggable(true)
                 .icon(BitmapDescriptorFactory
-                        .defaultMarker(markerColor)));
+                        .defaultMarker(markerColor));
+        mMap.clear();
+        if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) {
+           mMap.addMarker(mMarker);
             mLatLng = latLng;
             if (mBinding.buttonConfirm.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirm.setVisibility(View.VISIBLE);
@@ -300,10 +303,8 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             Toast.makeText(this,"You must close the image to put marker on map",Toast.LENGTH_LONG).show();
         }
     }
-
-
-
     public float getDistance(LatLng LatLng1, LatLng LatLng2) {
+
         double distance = 0;
         Location locationA = new Location("A");
         locationA.setLatitude(LatLng1.latitude);
@@ -319,6 +320,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     }
     public void score(LatLng latLng1,LatLng latLng2)
     {
+
         float distance = getDistance(latLng1, latLng2);
         long Score=5000-(long)(updateTime*0.1)-(long) distance*2;
         if(hint_pressed)
@@ -384,6 +386,24 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         }
         if(prevHighscore==0 && mRecord)
             mRecord=false;
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+
+        mLatLng=new LatLng(marker.getPosition().latitude,marker.getPosition().longitude);
+
 
     }
 

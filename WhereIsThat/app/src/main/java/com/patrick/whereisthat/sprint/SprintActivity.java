@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -63,7 +64,7 @@ import javax.security.auth.login.LoginException;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class SprintActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
+public class SprintActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener,GoogleMap.OnMarkerDragListener{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -96,6 +97,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private boolean clickedOne=false;
     private float markerColor;
     private boolean firstTime=true;
+    private MarkerOptions mMarker;
+
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
@@ -269,9 +272,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         mCountDownTimer.cancel();
                         Log.i("OnDestroy", "onDestroy:called ");
-                        if(mTask.getStatus()== AsyncTask.Status.RUNNING) {
-                            mTask.cancel(false);
-                        }
                         finish();
                         Intent intent = new Intent(getApplicationContext(), SprintActivity.class);
                         startActivity(intent);
@@ -381,18 +381,20 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mMap = googleMap;
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setOnMapClickListener(this);
+        mMap.setOnMarkerDragListener(this);
+
     }
     @Override
     public void onMapClick(LatLng latLng) {
-
+        mMarker=new MarkerOptions()
+                .position(new LatLng(latLng.latitude, latLng.longitude))
+                .draggable(true)
+                .icon(BitmapDescriptorFactory
+                        .defaultMarker(markerColor));
 
         mMap.clear();
         if(counter!=21 || !isFinished) {
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latLng.latitude, latLng.longitude))
-                    .draggable(true)
-                    .icon(BitmapDescriptorFactory
-                            .defaultMarker(markerColor)));
+            mMap.addMarker(mMarker);
             if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE) {
                 mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
                 clickedOne=false;
@@ -434,6 +436,25 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         return false;
     }
 
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        Log.i("CoordinatesBefore", String.valueOf(mLatLng.latitude));
+        Log.i("CoordinatesBefore", String.valueOf(mLatLng.longitude));
+        mLatLng=new LatLng(marker.getPosition().latitude,marker.getPosition().longitude);
+        Log.i("CoordinatesBefore", String.valueOf(mLatLng.latitude));
+        Log.i("CoordinatesBefore", String.valueOf(mLatLng.longitude));
+
+    }
 
 
     public class SprintTask extends AsyncTask <Void,Void,List<Sprint>> //select din baza de date
@@ -446,6 +467,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     .allowMainThreadQueries()
                     .build();
             sprintDao = db.sprintDao();
+            sprintDao.deleteAll();
             if (db.sprintDao().lines() == 0) {
                 SprintValues values = new SprintValues();
                 sprintList = values.getValues();
