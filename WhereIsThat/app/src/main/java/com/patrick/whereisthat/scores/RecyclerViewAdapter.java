@@ -188,7 +188,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         }
                     }
                         mArrayFiltered = arrayList;
-
+                    if(mArrayFiltered.size()>0) {
+                        if (mArrayFiltered.get(mArrayFiltered.size() - 1).getUser().equals(Username) && mArrayFiltered.size() > 1)
+                            mArrayFiltered.remove(mArrayFiltered.remove(mArrayFiltered.size() - 1));
+                    }
                 }
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = mArrayFiltered;
