@@ -2,6 +2,7 @@ package com.patrick.whereisthat.level;
 
 import android.annotation.SuppressLint;
 import android.arch.persistence.room.Room;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.location.Address;
@@ -10,6 +11,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -45,6 +48,7 @@ import com.patrick.whereisthat.levelsDB.LevelDao;
 import com.patrick.whereisthat.levelsDB.LevelDatabase;
 import com.patrick.whereisthat.levelsDB.Values;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
+import com.patrick.whereisthat.sprint.SprintActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,7 +93,9 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
     private boolean clickedOne=false;
     private float markerColor;
     private MarkerOptions mMarker;
+    private boolean scoreChange=false;
     LatLngBounds Europe;
+
 
 
     /**
@@ -383,6 +389,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             myRef.child(level).setValue(mScore);
             myRef.child("overall").setValue(overall);
             mRecord=true;
+            scoreChange=true;
         }
         if(prevHighscore==0 && mRecord)
             mRecord=false;
@@ -618,7 +625,7 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            mDialog=new DialogLevel();
+/*            mDialog=new DialogLevel();
             Bundle bundle=new Bundle();
             bundle.putBoolean("Finished",isFinished);
             bundle.putInt("Round",mCurrent);
@@ -628,9 +635,58 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             bundle.putFloat("Distance",mDistance);
             mDialog.setArguments(bundle);
             mDialog.setCancelable(false);
-            mDialog.show(getSupportFragmentManager(),"aaa");
+            mDialog.show(getSupportFragmentManager(),"aaa");*/
+            if(mCurrent==10) {
+                mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
+                UpdateScore();
+                makeToast();
+                DialogRestart();
+
+                     //   finish();
+            }
+            else {
+                new ImageTask().execute();
+                StartTimer();
+            }
+
 
         }
+    }
+    public void DialogRestart()
+    {
+
+
+        MaterialDialog dialogRestart=new MaterialDialog.Builder(this)
+                .title("Restart")
+                .content("Do you want to restart?")
+                .backgroundColorRes(R.color.grey)
+                .positiveText("Yes")
+                .negativeText("No")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finish();
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Log.i("OnDestroy", "onDestroy:called ");
+                        finish();
+                        Intent intent = new Intent(getApplicationContext(), LevelActivity.class);
+                        intent.putExtra(SelectLevelActivity.EXTRA_LEVEL_KEY, String.valueOf(mLevel));
+                           if(scoreChange)
+                               intent.putExtra(SelectLevelActivity.EXTRA_HIGHSCORE_KEY, String.valueOf(mScore));
+                           else
+                               intent.putExtra(SelectLevelActivity.EXTRA_HIGHSCORE_KEY, String.valueOf(mHigscore));
+                        intent.putExtra(SelectLevelActivity.EXTRA_OVERALL_KEY, String.valueOf(mOverall));
+                        startActivity(intent);
+                    }
+                })
+                .negativeColor(getResources().getColor(R.color.colorPrimary))
+                .positiveColor(getResources().getColor(R.color.colorPrimary))
+                .show();
+        dialogRestart.setCancelable(false);
     }
 
     public void makeToast()
@@ -639,7 +695,6 @@ public class LevelActivity extends AppCompatActivity implements  OnMapReadyCallb
             Toast.makeText(getApplicationContext(), "You've beat your level "+mLevel+ " record, now your highscore is "+mScore+" points!",
                     Toast.LENGTH_SHORT).show();
             else
-
         Toast.makeText(getApplicationContext(), "You've finished level "+mLevel+ " with "+mScore+" points!", Toast.LENGTH_SHORT).show();
     }
 }

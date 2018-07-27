@@ -99,6 +99,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private boolean firstTime=true;
     private MarkerOptions mMarker;
 
+
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
