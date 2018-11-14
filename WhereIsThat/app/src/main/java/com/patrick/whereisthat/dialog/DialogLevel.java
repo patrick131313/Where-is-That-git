@@ -28,39 +28,37 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
     TextView mTotal;
     TextView mTime;
     long updateTime;
-    int secs,mins,miliseconds;
-    Button mConfirm,mQuit;
+    int secs, mins, miliseconds;
+    Button mConfirm, mQuit;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       setStyle(DialogFragment.STYLE_NO_FRAME, R.style.FullscreenTheme);
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.FullscreenTheme);
 
     }
-
 
 
     @Override
     public void onStart() {
         super.onStart();
-        ((LevelActivity)getActivity()).new ImageTask().execute();;
+       ((LevelActivity) getActivity()).new ImageTask().execute();
 
 
-        android.app.Dialog dialog=getDialog();
+
+        android.app.Dialog dialog = getDialog();
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 Log.i("DialogOnDismiss", "onDismiss: ");
-                if(getArguments().getInt("Round")==10)
-                {
+                if (getArguments().getInt("Round") == 10) {
                     dismiss();
-                    ((LevelActivity)getActivity()).makeToast();
-                    ((LevelActivity)getActivity()).finish();
+                    ((LevelActivity) getActivity()).makeToast();
+                    ((LevelActivity) getActivity()).finish();
 
 
-                }
-                else {
+                } else {
                     dismiss();
                 }
 
@@ -68,44 +66,43 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
             }
         });
     }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view=inflater.inflate(R.layout.dialog_level,container,false);
-       mConfirm=view.findViewById(R.id.dialogContinue);
-       mQuit=view.findViewById(R.id.dialogQuit);
-        mRound=view.findViewById(R.id.dialogRound);
-        mTime=view.findViewById(R.id.dialogTime);
-        mScore=view.findViewById(R.id.dialogScore);
-        mTotal=view.findViewById(R.id.dialogTotal);
-        mDistance=view.findViewById(R.id.dialogDistance);
+        View view = inflater.inflate(R.layout.dialog_level, container, false);
+        mConfirm = view.findViewById(R.id.dialogContinue);
+        mQuit = view.findViewById(R.id.dialogQuit);
+        mRound = view.findViewById(R.id.dialogRound);
+        mTime = view.findViewById(R.id.dialogTime);
+        mScore = view.findViewById(R.id.dialogScore);
+        mTotal = view.findViewById(R.id.dialogTotal);
+        mDistance = view.findViewById(R.id.dialogDistance);
 
-        updateTime=getArguments().getLong("Time");
-        int secs = (int)(updateTime/1000);
-        int mins = secs/60;
-        secs%=60;
-        int miliseconds = (int)(updateTime%1000);
-        miliseconds=miliseconds/10;
-        if(mins==0) {
+        updateTime = getArguments().getLong("Time");
+        int secs = (int) (updateTime / 1000);
+        int mins = secs / 60;
+        secs %= 60;
+        int miliseconds = (int) (updateTime % 1000);
+        miliseconds = miliseconds / 10;
+        if (mins == 0) {
             mTime.setText("Time: " + String.format("%02d", secs) + ":"
                     + String.format("%02d", miliseconds));
-        }
-        else
-        {
+        } else {
             mTime.setText("Time: " + mins + ":" + String.format("%02d", secs) + ":"
                     + String.format("%02d", miliseconds));
         }
 
-        mScore.setText("Score: "+String.valueOf(getArguments().getLong("RoundScore")));
-        mRound.setText("Round "+String.valueOf(getArguments().getInt("Round"))+"/10");
-        mTotal.setText("Total Score: "+String.valueOf(getArguments().getLong("Score")));
-        mDistance.setText("Distance: "+String.valueOf(getArguments().getFloat("Distance"))+"km");
+        mScore.setText("Score: " + String.valueOf(getArguments().getLong("RoundScore")));
+        mRound.setText("Round " + String.valueOf(getArguments().getInt("Round")) + "/10");
+        mTotal.setText("Total Score: " + String.valueOf(getArguments().getLong("Score")));
+        mDistance.setText("Distance: " + String.valueOf(getArguments().getFloat("Distance")) + "km");
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();
-                ((LevelActivity)getActivity()).StartTimer();
+                ((LevelActivity) getActivity()).StartTimer();
 
             }
         });
@@ -113,11 +110,12 @@ public class DialogLevel extends DialogFragment implements DialogInterface.OnDis
             @Override
             public void onClick(View view) {
                 dismiss();
-                ((LevelActivity)getActivity()).onBackPressed();
+                ((LevelActivity) getActivity()).onBackPressed();
             }
         });
-     
+
 
         return view;
     }
+
 }
