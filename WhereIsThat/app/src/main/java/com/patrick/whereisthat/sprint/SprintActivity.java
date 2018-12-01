@@ -1,13 +1,11 @@
 package com.patrick.whereisthat.sprint;
 
 import android.annotation.SuppressLint;
+import android.app.LauncherActivity;
 import android.arch.persistence.room.Room;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
@@ -24,47 +22,38 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.patrick.whereisthat.R;
-import com.patrick.whereisthat.StartActivity;
-import com.patrick.whereisthat.databinding.ActivityLevelBinding;
 import com.patrick.whereisthat.databinding.ActivitySprintBinding;
 import com.patrick.whereisthat.dialog.Dialog;
-import com.patrick.whereisthat.dialog.DialogRestart;
 import com.patrick.whereisthat.sprintDB.Cities;
 import com.patrick.whereisthat.sprintDB.Sprint;
 import com.patrick.whereisthat.sprintDB.SprintDao;
 import com.patrick.whereisthat.sprintDB.SprintDatabase;
 import com.patrick.whereisthat.sprintDB.SprintValues;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.prefs.Preferences;
 
-import javax.security.auth.login.LoginException;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
-public class SprintActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener,GoogleMap.OnMarkerDragListener{
+public class SprintActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapClickListener{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -72,32 +61,24 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     private List<Sprint> sprintList = new ArrayList<Sprint>();
     private SprintDao sprintDao;
     private static final boolean AUTO_HIDE = true;
-    private GoogleMap mMap;
-    private int nr_cities=0;
     private int counter=0;
-    public AsyncTask mTask;
-    private List<Cities> mCities=new ArrayList<Cities>();
-    List<LatLng> latLngs = new ArrayList<LatLng>();
-    boolean isFirst=true;
     ActivitySprintBinding mBinding;
-    boolean isReady=false;
     private long mTimeRemaining;
     private long mTime=120000;
     public CountDownTimer mCountDownTimer;
-    private String mCurrent="DB";
     private long mScore=0;
     private LatLng mLatLng;
-    private boolean onDestroyCalled=false;
     private SharedPreferences sharedPreferences;
-    private float mDistance;
     private long mScoreRound=0;
     private boolean isFinished=false;
-    private Dialog mDialog;
     private MaterialDialog dialogCity;
     private boolean clickedOne=false;
-    private float markerColor;
     private boolean firstTime=true;
     private MarkerOptions mMarker;
+    private MapView mapView;
+    private MapboxMap mMapBoxMap;
+    private Icon mMarkerIcon;
+
 
 
     /**
@@ -110,31 +91,13 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
-    private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
 
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
     private View mControlsView;
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
         public void run() {
-            // Delayed display of UI elements
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.show();
@@ -167,18 +130,24 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Mapbox.getInstance(this, "pk.eyJ1IjoicGF0cmljazEzMTMiLCJhIjoiY2pvNWppOWk1MGJkcDN3cW00a2tjOTVuMCJ9.4HjyRn4wmuFepe1lX5Ojvw");
+
         mBinding= DataBindingUtil.setContentView(this,R.layout.activity_sprint);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_sprint);
-        mapFragment.getMapAsync((OnMapReadyCallback) this);
+
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.map_sprint);
+        mContentView = findViewById(R.id.mapView);
         new SprintTask().execute();
-        new MapTask().execute();
+      //  new MapTask().execute();
 
         mBinding.textViewCountdown.setText("2:00:00");
         StartTimer();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mBinding.closeCitySprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -203,12 +172,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
 
-
-        // Set up the user interaction to manually show or hide the system UI.
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
     }
     public void StartTimer()
     {
@@ -233,8 +196,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 mTimeRemaining=millisUntilFinished;
 
             }
-
-
             public void onFinish() {
 
                 Log.i("OnFinish", "Game finished");
@@ -244,14 +205,11 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 isFinished=true;
                 DialogRestart();
             }
-
-
         };
     }
 
     public void DialogRestart()
     {
-
         if(dialogCity!=null)
         {
             dialogCity.dismiss();
@@ -319,14 +277,16 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
         });
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mCountDownTimer.cancel();
+        if(mapView!=null)
+        {
+            mapView.onDestroy();
+        }
         Log.i("OnDestroy", "onDestroy:called ");
     }
 
@@ -352,19 +312,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         // Schedule a runnable to remove the status and navigation bar after a delay
         mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    @SuppressLint("InlinedApi")
-    private void show() {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+   //     mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
     /**
@@ -376,87 +324,68 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
+   public float getDistance(com.mapbox.mapboxsdk.geometry.LatLng LatLng1, com.mapbox.mapboxsdk.geometry.LatLng LatLng2) {
 
-        mMap = googleMap;
-        mMap.getUiSettings().setRotateGesturesEnabled(false);
-        mMap.setOnMapClickListener(this);
-        mMap.setOnMarkerDragListener(this);
-
-    }
-    @Override
-    public void onMapClick(LatLng latLng) {
-        mMarker=new MarkerOptions()
-                .position(new LatLng(latLng.latitude, latLng.longitude))
-                .draggable(true)
-                .icon(BitmapDescriptorFactory
-                        .defaultMarker(markerColor));
-
-        mMap.clear();
-        if(counter!=21 || !isFinished) {
-            mMap.addMarker(mMarker);
-            if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE) {
-                mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
-                clickedOne=false;
-            }
-            mLatLng = latLng;
-        }
-     
-    }
-
-    public float getDistance(LatLng LatLng1, LatLng LatLng2) {
-        double distance = 0;
-        Location locationA = new Location("A");
-        locationA.setLatitude(LatLng1.latitude);
-        locationA.setLongitude(LatLng1.longitude);
-        Location locationB = new Location("B");
-        locationB.setLatitude(LatLng2.latitude);
-        locationB.setLongitude(LatLng2.longitude);
-        distance = locationA.distanceTo(locationB) * 100;
-        int km = ((int) distance) / 1000;
-        float kmtot = km;
-        mDistance=kmtot/100;
-        return kmtot / 100;
-    }
-    public void score(LatLng latLng1,LatLng latLng2)
+       double distance = 0;
+       Location locationA = new Location("A");
+       locationA.setLatitude(LatLng1.getLatitude());
+       locationA.setLongitude(LatLng1.getLongitude());
+       Location locationB = new Location("B");
+       locationB.setLatitude(LatLng2.getLatitude());
+       locationB.setLongitude(LatLng2.getLongitude());
+       distance = locationA.distanceTo(locationB) * 100;
+       int km = ((int) distance) / 1000;
+       float kmtot = km;
+       return kmtot / 100;
+   }
+    public void score(com.mapbox.mapboxsdk.geometry.LatLng latLng1, com.mapbox.mapboxsdk.geometry.LatLng latLng2)
     {
         float distance = getDistance(latLng1, latLng2);
         long Score=5000-(long) distance*2;
         mScoreRound=Score;
         mScore=mScore+Score;
 
-
-    }
-
-
-    public Boolean ContainsCyrillic(String s) {
-        for (int i = 0; i < s.length(); i++)
-            if (Character.UnicodeBlock.of(s.charAt(i)).equals(Character.UnicodeBlock.CYRILLIC))
-                return true;
-        return false;
     }
 
     @Override
-    public void onMarkerDragStart(Marker marker) {
+    public void onMapClick(@NonNull com.mapbox.mapboxsdk.geometry.LatLng latLng) {
 
+     /*   IconFactory iconFactory = IconFactory.getInstance(this);
+        Icon icon = iconFactory.fromResource(R.drawable.red_flag);*/
+        mMapBoxMap.removeAnnotations();
+        mMarker=new MarkerOptions()
+                .icon(mMarkerIcon)
+                .position(new com.mapbox.mapboxsdk.geometry.LatLng(latLng.getLatitude(), latLng.getLongitude()));
+
+
+        if(counter!=21 || !isFinished) {
+          mMapBoxMap.addMarker(mMarker);
+            if (mBinding.buttonConfirmSprint.getVisibility() == View.INVISIBLE) {
+                mBinding.buttonConfirmSprint.setVisibility(View.VISIBLE);
+                clickedOne=false;
+            }
+            mLatLng = latLng;
+        }
     }
 
     @Override
-    public void onMarkerDrag(Marker marker) {
+    public void onMapReady(MapboxMap mapboxMap) {
+        new MapTask().execute();
+        LatLngBounds latLngBounds = new com.mapbox.mapboxsdk.geometry.LatLngBounds.Builder()
+                .include(new com.mapbox.mapboxsdk.geometry.LatLng(37, -30))
+                .include(new com.mapbox.mapboxsdk.geometry.LatLng(71, 50.5))
+                .build();
 
+        mMapBoxMap = mapboxMap;
+
+        mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k1p3u1ehk2spiuq3xhmky");
+        mMapBoxMap.addOnMapClickListener(this);
+        mMapBoxMap.getUiSettings().setCompassEnabled(false);
+        mMapBoxMap.getUiSettings().setRotateGesturesEnabled(false);
+        mMapBoxMap.setLatLngBoundsForCameraTarget(latLngBounds);
+        mMapBoxMap.setMaxZoomPreference(7);
+        mMapBoxMap.setMinZoomPreference(3);
     }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        Log.i("CoordinatesBefore", String.valueOf(mLatLng.latitude));
-        Log.i("CoordinatesBefore", String.valueOf(mLatLng.longitude));
-        mLatLng=new LatLng(marker.getPosition().latitude,marker.getPosition().longitude);
-        Log.i("CoordinatesBefore", String.valueOf(mLatLng.latitude));
-        Log.i("CoordinatesBefore", String.valueOf(mLatLng.longitude));
-
-    }
-
 
     public class SprintTask extends AsyncTask <Void,Void,List<Sprint>> //select din baza de date
     {
@@ -484,7 +413,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
         protected void onPostExecute(List<Sprint> sprints) {
             super.onPostExecute(sprints);
             Log.i("aaaa", "onCreate: db: " +"test");
-
             sprintList = sprints;
             Log.i("aaaa",String.valueOf(sprintDao.lines()));
             for (int i = 0; i < sprintList.size(); i++) {
@@ -495,77 +423,75 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             DialogCity(sprintList.get(0).getCity());
         }
     }
-    public class MapTask extends AsyncTask<Void, Void, Integer> //map style etc
+
+    public class MapTask extends AsyncTask<Void, Void, Integer>
     {
 
         @Override
         protected Integer doInBackground(Void... voids) {
-
-
             return 1;
-
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            mMap.getUiSettings().setMapToolbarEnabled(false);
-            String map=sharedPreferences.getString("MapPref","4");
+            mMapBoxMap.getUiSettings().setCompassEnabled(false);
+            mMapBoxMap.getUiSettings().setRotateGesturesEnabled(false);
+            mMapBoxMap.setMaxZoomPreference(7);
+            mMapBoxMap.setMinZoomPreference(3);
+            String map=sharedPreferences.getString("MapPref","1");
+
             String marker=sharedPreferences.getString("MarkerPref","4");
-                Log.i("MarkerSettings", marker);
             switch (marker)
             {
                 case "1":
-                    markerColor=BitmapDescriptorFactory.HUE_GREEN;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_green));
                     break;
                 case "2":
-                    markerColor=BitmapDescriptorFactory.HUE_MAGENTA;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_magenta));
                     break;
                 case "3":
-                    markerColor=BitmapDescriptorFactory.HUE_ORANGE;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_orange));
                     break;
                 case "4":
-                    markerColor=BitmapDescriptorFactory.HUE_RED;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_red));
                     break;
                 case "5":
-                    markerColor=BitmapDescriptorFactory.HUE_VIOLET;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_blue));
                     break;
                 case "6":
-                    markerColor=BitmapDescriptorFactory.HUE_YELLOW;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_yellow));
                     break;
                 default:break;
             }
             switch (map)
             {
                 case "1":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
-                    mBinding.buttonConfirmSprint.setImageDrawable(getDrawable(R.drawable.ic_check_white));
-                    mBinding.textViewSprintHs.setTextColor(getColor(R.color.colorWhite));
-                    mBinding.twRound.setTextColor(getColor(R.color.colorWhite));
-                    mBinding.textViewCountdown.setTextColor(getColor(R.color.colorWhite));
+                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
+                    mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewScore.setTextColor(getColor(R.color.colorWhite));
+                    mBinding.textViewTimer.setTextColor(getColor(R.color.colorWhite));
+                    mBinding.textViewWhere.setTextColor(getColor(R.color.colorWhite));*/
+                    mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8jpszu0ras2sl5v1y870g9");
                     break;
                 case "2":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
+                    //  mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
+                    mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo5rti5u0c182snzl828eeth");
                     break;
                 case "3":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    //   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k1p3u1ehk2spiuq3xhmky");
                     break;
                 case "4":
-                    mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));
+                    //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));
+                    mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k5r2n2xna2snzzjkg3rvi");
+                    break;
+                default:
                     break;
 
-                default:break;
-
             }
-
-            LatLngBounds Europe = new LatLngBounds(new LatLng(37, -30), new LatLng(71, 50.5));
-            mMap.setMinZoomPreference(4.0f);
-            mMap.setMaxZoomPreference(7.0f);
-            mMap.setLatLngBoundsForCameraTarget(Europe);
-
         }
     }
-
 
     public class NextCityTask extends AsyncTask<Void,Void,String> //trecere la orasul urmator
     {
@@ -586,14 +512,14 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 Log.i("Score", "After"+String.valueOf(mScore));
                 mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
                 mCountDownTimer.onFinish();
-                mMap.clear();
+                mMapBoxMap.removeAnnotations();
                 mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
                 mBinding.textViewSprint.setVisibility(View.INVISIBLE);
                 mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
                 mBinding.twRound.setText("Round: 20/20");
             }
             else {
-                    mMap.clear();
+                   mMapBoxMap.removeAnnotations();
                     DialogCity(s);
                     mBinding.twRound.setText("Round: "+String.valueOf(counter + 1) + "/20");
                     mBinding.textViewSprint.setVisibility(View.VISIBLE);
@@ -605,13 +531,11 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     }
     public class ScoreTask extends AsyncTask<Void,Void,Void>
     {
-
-
-
         @Override
         protected Void doInBackground(Void... voids) {
-         LatLng dbLatLng=new LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
-         score(dbLatLng,mLatLng);
+            com.mapbox.mapboxsdk.geometry.LatLng dbLatLng=new com.mapbox.mapboxsdk.geometry.LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
+
+            score(dbLatLng,mLatLng);
          counter++;
             return null;
         }
@@ -623,7 +547,6 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
         }
     }
-
 
     public void DialogCity(String s)
     {

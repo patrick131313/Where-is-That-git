@@ -2,10 +2,10 @@
 <resources>
 
     <string-array name="listStyle">
-        <item>Dark</item>
-        <item>Orange</item>
-        <item>Retro</item>
+        <item>Normal</item>
         <item>Yellow</item>
+        <item>Dark</item>
+        <item>Fluorescent</item>
     </string-array>
 
     <string-array name="listMarker">
@@ -13,7 +13,7 @@
         <item>Magenta</item>
         <item>Orange</item>
         <item>Red</item>
-        <item>Violet</item>
+        <item>Blue</item>
         <item>Yellow</item>
     </string-array>
 

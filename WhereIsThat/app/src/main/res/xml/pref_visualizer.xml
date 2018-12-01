@@ -15,7 +15,7 @@
         <ListPreference
             android:title="Select map style"
             android:key="MapPref"
-            android:defaultValue="4"
+            android:defaultValue="1"
             android:entries="@array/listStyle"
             android:entryValues="@array/listValues" />
 

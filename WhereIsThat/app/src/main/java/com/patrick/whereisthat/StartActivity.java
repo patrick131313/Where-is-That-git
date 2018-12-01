@@ -18,8 +18,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,7 +38,6 @@ import java.util.TimerTask;
 
 public class StartActivity extends FragmentActivity {
 
-    private GoogleMap mMap;
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth mFirebaseAuth;
     public static final String EXTRA_USERNAME="USERNAME_KEY";
