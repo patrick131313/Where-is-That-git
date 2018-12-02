@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -467,11 +468,12 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             switch (map)
             {
                 case "1":
-                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
-                    mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
-                    mBinding.textViewScore.setTextColor(getColor(R.color.colorWhite));
+                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));*/
+                 //   mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                   /* mBinding.textViewScore.setTextColor(getColor(R.color.colorWhite));
                     mBinding.textViewTimer.setTextColor(getColor(R.color.colorWhite));
                     mBinding.textViewWhere.setTextColor(getColor(R.color.colorWhite));*/
+
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8jpszu0ras2sl5v1y870g9");
                     break;
                 case "2":
@@ -480,10 +482,19 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                     break;
                 case "3":
                     //   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    mBinding.buttonConfirmSprint.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewCountdown.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.twRound.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.textViewSprintHs.setTextColor(getResources().getColor(R.color.colorWhite));
+
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k1p3u1ehk2spiuq3xhmky");
                     break;
                 case "4":
                     //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));
+                    mBinding.buttonConfirmSprint.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewCountdown.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.twRound.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.textViewSprintHs.setTextColor(getResources().getColor(R.color.colorWhite));
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k5r2n2xna2snzzjkg3rvi");
                     break;
                 default:

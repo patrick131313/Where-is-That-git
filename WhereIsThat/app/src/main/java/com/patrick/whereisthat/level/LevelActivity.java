@@ -26,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -72,6 +74,7 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
     private boolean scoreChange=false;
     private MapView mapView;
     private MapboxMap mMapBoxMap;
+    private Icon mMarkerIcon;
 
     private final Handler mHideHandler = new Handler();
 
@@ -298,6 +301,7 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
 
         mMapBoxMap.removeAnnotations();
         mMarker=new com.mapbox.mapboxsdk.annotations.MarkerOptions()
+                .icon(mMarkerIcon)
                 .position(new com.mapbox.mapboxsdk.geometry.LatLng(latLng.getLatitude(), latLng.getLongitude()));
         if (!isFinished && mBinding.imageViewDb.getVisibility()==View.INVISIBLE) {
             mMapBoxMap.addMarker(mMarker);
@@ -450,37 +454,33 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
             String map=sharedPreferences.getString("MapPref","1");
 
             //   mMap.getUiSettings().setMapToolbarEnabled(false);
-         /*   String marker=sharedPreferences.getString("MarkerPref","4");
+           String marker=sharedPreferences.getString("MarkerPref","4");
             switch (marker)
             {
                 case "1":
-                    markerColor=BitmapDescriptorFactory.HUE_GREEN;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_green));
                     break;
                 case "2":
-                    markerColor=BitmapDescriptorFactory.HUE_MAGENTA;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_magenta));
                     break;
                 case "3":
-                    markerColor=BitmapDescriptorFactory.HUE_ORANGE;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_orange));
                     break;
                 case "4":
-                    markerColor=BitmapDescriptorFactory.HUE_RED;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_red));
                     break;
                 case "5":
-                    markerColor=BitmapDescriptorFactory.HUE_VIOLET;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_blue));
                     break;
                 case "6":
-                    markerColor=BitmapDescriptorFactory.HUE_YELLOW;
+                    mMarkerIcon=(IconFactory.getInstance(getApplicationContext()).fromResource(R.drawable.ic_marker_yellow));
                     break;
                 default:break;
-            }*/
+            }
             switch (map)
             {
                 case "1":
-                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));
-                    mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
-                    mBinding.textViewScore.setTextColor(getColor(R.color.colorWhite));
-                    mBinding.textViewTimer.setTextColor(getColor(R.color.colorWhite));
-                    mBinding.textViewWhere.setTextColor(getColor(R.color.colorWhite));*/
+                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));*/
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8jpszu0ras2sl5v1y870g9");
                     break;
                 case "2":
@@ -489,11 +489,20 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
                     break;
                 case "3":
                  //   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewScore.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.textViewTimer.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.textViewWhere.setTextColor(getResources().getColor(R.color.colorWhite));
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k1p3u1ehk2spiuq3xhmky");
                     break;
                 case "4":
                     //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_yellow));
+                    mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    mBinding.textViewScore.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.textViewTimer.setTextColor(getResources().getColor(R.color.colorWhite));
+                    mBinding.textViewWhere.setTextColor(getResources().getColor(R.color.colorWhite));
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k5r2n2xna2snzzjkg3rvi");
+                    
                     break;
                 default:
                     break;
