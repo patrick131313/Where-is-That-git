@@ -16,10 +16,10 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:mapbox_cameraTargetLat="49.80938"
-        mapbox:mapbox_cameraTargetLng="15.72972"
+        mapbox:mapbox_cameraTargetLat="53.009699"
+        mapbox:mapbox_cameraTargetLng="5.693144"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
-        mapbox:mapbox_cameraZoom="4" />
+        mapbox:mapbox_cameraZoom="3" />
 
 
     <ImageButton

@@ -49,6 +49,7 @@ import com.patrick.whereisthat.sprintDB.Sprint;
 import com.patrick.whereisthat.sprintDB.SprintDao;
 import com.patrick.whereisthat.sprintDB.SprintDatabase;
 import com.patrick.whereisthat.sprintDB.SprintValues;
+import com.patrick.whereisthat.utils.MapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -371,6 +372,7 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
+
         new MapTask().execute();
         LatLngBounds latLngBounds = new com.mapbox.mapboxsdk.geometry.LatLngBounds.Builder()
                 .include(new com.mapbox.mapboxsdk.geometry.LatLng(37, -30))
@@ -378,14 +380,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 .build();
 
         mMapBoxMap = mapboxMap;
-
-        mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k1p3u1ehk2spiuq3xhmky");
         mMapBoxMap.addOnMapClickListener(this);
-        mMapBoxMap.getUiSettings().setCompassEnabled(false);
-        mMapBoxMap.getUiSettings().setRotateGesturesEnabled(false);
         mMapBoxMap.setLatLngBoundsForCameraTarget(latLngBounds);
-        mMapBoxMap.setMaxZoomPreference(7);
-        mMapBoxMap.setMinZoomPreference(3);
     }
 
     public class SprintTask extends AsyncTask <Void,Void,List<Sprint>> //select din baza de date
@@ -468,8 +464,8 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
             switch (map)
             {
                 case "1":
-                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));*/
-                 //   mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
+                    /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));*/
+                    //   mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
                    /* mBinding.textViewScore.setTextColor(getColor(R.color.colorWhite));
                     mBinding.textViewTimer.setTextColor(getColor(R.color.colorWhite));
                     mBinding.textViewWhere.setTextColor(getColor(R.color.colorWhite));*/
@@ -523,14 +519,16 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
                 Log.i("Score", "After"+String.valueOf(mScore));
                 mBinding.textViewSprintHs.setText("Score: "+String.valueOf(mScore));
                 mCountDownTimer.onFinish();
-                mMapBoxMap.removeAnnotations();
+                MapUtils.moveCameraToInitial(mMapBoxMap);
+                //mMapBoxMap.removeAnnotations();
                 mBinding.buttonConfirmSprint.setVisibility(View.INVISIBLE);
                 mBinding.textViewSprint.setVisibility(View.INVISIBLE);
                 mBinding.closeCitySprint.setVisibility(View.INVISIBLE);
                 mBinding.twRound.setText("Round: 20/20");
             }
             else {
-                   mMapBoxMap.removeAnnotations();
+                MapUtils.moveCameraToInitial(mMapBoxMap);
+                //mMapBoxMap.removeAnnotations();
                     DialogCity(s);
                     mBinding.twRound.setText("Round: "+String.valueOf(counter + 1) + "/20");
                     mBinding.textViewSprint.setVisibility(View.VISIBLE);
@@ -544,10 +542,9 @@ public class SprintActivity extends AppCompatActivity implements OnMapReadyCallb
     {
         @Override
         protected Void doInBackground(Void... voids) {
-            com.mapbox.mapboxsdk.geometry.LatLng dbLatLng=new com.mapbox.mapboxsdk.geometry.LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
-
+            LatLng dbLatLng=new LatLng(Double.parseDouble(sprintList.get(counter).getLatitude()),Double.parseDouble(sprintList.get(counter).getLongitude()));
             score(dbLatLng,mLatLng);
-         counter++;
+            counter++;
             return null;
         }
 

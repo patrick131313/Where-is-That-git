@@ -14,10 +14,10 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:mapbox_cameraTargetLat="49.80938"
-        mapbox:mapbox_cameraTargetLng="15.72972"
+        mapbox:mapbox_cameraTargetLat="53.009699"
+        mapbox:mapbox_cameraTargetLng="5.693144"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
-        mapbox:mapbox_cameraZoom="4" />
+        mapbox:mapbox_cameraZoom="3" />
 
     <ImageView
         android:id="@+id/image_view_close"
@@ -104,11 +104,9 @@
         android:id="@+id/button_hint"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_alignBottom="@+id/text_view_hint"
-        android:layout_alignEnd="@+id/text_view_where"
-        android:layout_marginEnd="14dp"
         android:background="#00000000"
-        android:padding="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
         android:src="@drawable/ic_hint"
         android:text="hint"
         android:visibility="visible" />
@@ -139,8 +137,6 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:layout_centerHorizontal="true"
-
-
         android:layout_margin="8dp"
         android:padding="8dp"
         android:text="Time:00:00"

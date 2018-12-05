@@ -93,6 +93,7 @@ public class SelectLevelActivity extends AppCompatActivity {
 
 
         private String[] mArrayLevels;
+        private int lastLevelCompleted;
         private Map<String,Long> mHigscores;
         private Context mContext;
         public RecyclerViewAdapter(Context mContext,String []mArrayLevels, Map<String,Long> mHighscores)
@@ -106,8 +107,20 @@ public class SelectLevelActivity extends AppCompatActivity {
         public void ReplaceData(Map<String,Long> mHighgscores)
         {
             this.mHigscores=mHighscores;
+            mLastPlayed=checkLastLevel();
             mAdapter.notifyDataSetChanged();
         }
+
+        private int checkLastLevel() {
+
+            final int score=(int) (long)mHighscores.get("level"+String.valueOf(1));
+
+            for(int i=1;i<mHighscores.size();i++)
+                if((int) (long)mHighscores.get("level"+String.valueOf(i))==0)
+                    return i-1;
+                return mHighscores.size()-1;
+        }
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -123,8 +136,8 @@ public class SelectLevelActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, final int position) {
             int level=position+1;
             Log.i("Imagechanged",  String.valueOf(position));
-            holder.mImageView.setImageResource(getResources().getIdentifier("ic_"+String.valueOf(level), "drawable", getPackageName()));
 
+            holder.mImageView.setImageResource(getResources().getIdentifier("ic_"+String.valueOf(level), "drawable", getPackageName()));
             holder.mLevel.setText(mArrayLevels[position]);
             if(mHigscores.isEmpty())
             {
@@ -136,41 +149,26 @@ public class SelectLevelActivity extends AppCompatActivity {
                 holder.mProgress.setVisibility(View.INVISIBLE);
                 final Object score=mHighscores.get("level"+String.valueOf(position+1));
                 holder.mHighscore.setText("Higscore:"+score.toString());
-                if(position!=0)
-                {
-                    Object prev = mHighscores.get("level" + String.valueOf(position));
-                    prevLevel = (Long) prev;
-                }
-                if ((position == 0) || (position != 0 && prevLevel != 0)) {
-                    mLastPlayed = position + 1;
-                }
                 holder.mLevelItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         checked=false;
                         new CheckInternetTask().execute();
-                        Object prev = mHighscores.get("level" + String.valueOf(position));
                         while (!checked)
                         {
                             Log.i("Checcked", String.valueOf(checked));
                         }
                         Log.i("Checcked", String.valueOf(checked));
-                        // Toast.makeText(getApplicationContext(),"level"+String.valueOf(position+1)+" clicked",Toast.LENGTH_SHORT).show();
                         if(mInternet) {
-                            if (position + 1 <= mLastPlayed) {
+                            if (position <= mLastPlayed) {
                                 Intent intent = new Intent(getApplicationContext(), LevelActivity.class);
                                 intent.putExtra(EXTRA_LEVEL_KEY, String.valueOf(position + 1));
                                 intent.putExtra(EXTRA_HIGHSCORE_KEY, score.toString());
                                 intent.putExtra(EXTRA_OVERALL_KEY, mHighscores.get("overall").toString());
                                 startActivity(intent);
                             } else {
-                                if (mLastPlayed != 0)
-                                    Toast.makeText(getApplicationContext(), "You can't play this level now,complete level " + String.valueOf(mLastPlayed)
+                                    Toast.makeText(getApplicationContext(), "You can't play this level now,complete level " + String.valueOf(mLastPlayed+1)
                                             , Toast.LENGTH_LONG).show();
-                                else
-                                    Toast.makeText(getApplicationContext(), "You can't play this level now"
-                                            , Toast.LENGTH_LONG).show();
-
                             }
                         }
                         else
@@ -182,25 +180,22 @@ public class SelectLevelActivity extends AppCompatActivity {
                 });
             }
 
-            Log.d("RecyclerView", "onBindViewHolder: called.");
-
         }
 
         @Override
         public int getItemCount() {
-            //return mList.size();
             return 11;
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            public ImageView mImageView;
-            public TextView mLevel;
-            public TextView mHighscore;
-            public RelativeLayout mLevelItem;
-            public ProgressBar mProgress;
+            private ImageView mImageView;
+            private TextView mLevel;
+            private TextView mHighscore;
+            private RelativeLayout mLevelItem;
+            private ProgressBar mProgress;
 
-            public ViewHolder(View itemView) {
+            private ViewHolder(View itemView) {
                 super(itemView);
                 Log.d("RecyclerView", "view holder");
 

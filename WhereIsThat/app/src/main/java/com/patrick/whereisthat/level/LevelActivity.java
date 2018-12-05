@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -42,6 +43,7 @@ import com.patrick.whereisthat.levelsDB.LevelDao;
 import com.patrick.whereisthat.levelsDB.LevelDatabase;
 import com.patrick.whereisthat.levelsDB.Values;
 import com.patrick.whereisthat.selectlevel.SelectLevelActivity;
+import com.patrick.whereisthat.utils.MapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,12 +131,13 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
                 if(!isFinished && clickedOne==false)
                 {
                     StopTimer();
-                    mMapBoxMap.removeAnnotations();
+                    MapUtils.moveCameraToInitial(mMapBoxMap);
                     new ScoreTask().execute();
                     clickedOne=true;
                 }
                 else
-                {   mMapBoxMap.removeAnnotations();
+                {   MapUtils.moveCameraToInitial(mMapBoxMap);
+                    //mMapBoxMap.removeAnnotations();
                     Toast.makeText(getApplicationContext(),"Level completed",Toast.LENGTH_LONG).show();
                     mBinding.buttonConfirm.setVisibility(View.INVISIBLE);
                     mBinding.buttonHint.setVisibility(View.INVISIBLE);
@@ -286,14 +289,9 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
                 .build();
 
         mMapBoxMap = mapboxMap;
-      //  mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k1p3u1ehk2spiuq3xhmky");
         mMapBoxMap.addOnMapClickListener(this);
         mMapBoxMap.setLatLngBoundsForCameraTarget(latLngBounds);
 
-     /*   mMapBoxMap.getUiSettings().setCompassEnabled(false);
-        mMapBoxMap.getUiSettings().setRotateGesturesEnabled(false);
-        mMapBoxMap.setMaxZoomPreference(7);
-        mMapBoxMap.setMinZoomPreference(3);*/
     }
 
     @Override
@@ -413,7 +411,6 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
             }
             else
             {
-
                 mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
                 hint_pressed=false;
                 mBinding.textViewRound.setText("Round:"+(mCurrent+1)+"/10");
@@ -441,7 +438,7 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
 
         @Override
         protected Integer doInBackground(Void... voids) {
-          return 1;
+            return 1;
         }
 
         @Override
@@ -454,7 +451,7 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
             String map=sharedPreferences.getString("MapPref","1");
 
             //   mMap.getUiSettings().setMapToolbarEnabled(false);
-           String marker=sharedPreferences.getString("MarkerPref","4");
+            String marker=sharedPreferences.getString("MarkerPref","4");
             switch (marker)
             {
                 case "1":
@@ -480,15 +477,15 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
             switch (map)
             {
                 case "1":
-                 /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));*/
+                    /*   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_dark));*/
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8jpszu0ras2sl5v1y870g9");
                     break;
                 case "2":
-                  //  mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
+                    //  mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_orange));
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo5rti5u0c182snzl828eeth");
                     break;
                 case "3":
-                 //   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
+                    //   mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.map_retro));
                     mBinding.buttonConfirm.setImageDrawable(getDrawable(R.drawable.ic_check_white));
                     mBinding.textViewScore.setTextColor(getResources().getColor(R.color.colorWhite));
                     mBinding.textViewTimer.setTextColor(getResources().getColor(R.color.colorWhite));
@@ -502,7 +499,7 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
                     mBinding.textViewTimer.setTextColor(getResources().getColor(R.color.colorWhite));
                     mBinding.textViewWhere.setTextColor(getResources().getColor(R.color.colorWhite));
                     mMapBoxMap.setStyleUrl("mapbox://styles/patrick1313/cjo8k5r2n2xna2snzzjkg3rvi");
-                    
+
                     break;
                 default:
                     break;
@@ -522,7 +519,6 @@ public class LevelActivity extends AppCompatActivity implements OnMapReadyCallba
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             if(mCurrent==10)
             {
                 mBinding.textViewScore.setText("Score:"+String.valueOf(mScore));
